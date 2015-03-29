@@ -1,6 +1,10 @@
 package main;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+
 import console.Console;
+import serviceInterfaces.*;
 
 public class Main {
 	
@@ -10,10 +14,10 @@ public class Main {
 	public static Integer portMDB;
 	public static String ipMDR;
 	public static Integer portMDR;
-	
 	private static Console console = null;
+	private static serviceInterfaces.Backup backup = null;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		if (args.length != 6){
 			System.out.println("Usage: java <ipMC> <portMC> <ipMDB> <portMDB> <ipMDR> <portMDR>");
 			return;
@@ -27,6 +31,11 @@ public class Main {
 			portMDR = Integer.parseInt(args[5]);
 			
 			console = new Console();
+			
+			switch(console.getUserOption()){
+			case "BACKUP":
+				backup = new Backup();
+			}
 		}
 	}
 }
