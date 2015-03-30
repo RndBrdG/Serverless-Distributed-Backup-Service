@@ -43,5 +43,7 @@ public class Main {
 				backup = new Backup();
 			}
 		}
+		
+		console.endInput();
 	}
 }
