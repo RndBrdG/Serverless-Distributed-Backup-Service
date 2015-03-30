@@ -64,4 +64,8 @@ public class Console {
 	public String getUserOption(){
 		return this.userOption;
 	}
+	
+	public void endInput(){
+		input.close();
+	}
 }
