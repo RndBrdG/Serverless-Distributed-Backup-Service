@@ -16,6 +16,7 @@ public class Main {
 	public static Integer portMDB;
 	public static String ipMDR;
 	public static Integer portMDR;
+	public static MulticastChannel MC = null;
 	private static Console console = null;
 	private static serviceInterfaces.Backup backup = null;
 	
@@ -33,7 +34,7 @@ public class Main {
 			portMDR = Integer.parseInt(args[5]);
 			
 			// Subscreve o canal de multicast MC. Subscrever também o MDB e o MDR logo ao início?
-			MulticastChannel MC = new MulticastChannel(ipMC, portMC);
+			MC = new MulticastChannel(ipMC, portMC);
 			MC.join();
 			
 			console = new Console();
@@ -41,14 +42,24 @@ public class Main {
 			switch (console.getUserOption()) {
 			case "BACKUP":
 				backup = new Backup();
+				break;
+			case "RESTORE":
+					String ex = MC.receive();
+					
+					String[] splitMessage = ex.split("\\s+");
+					String teste = splitMessage[5];
+					System.out.println(teste);
+					
 			}
-			
 			MC.close();
 		}
 		
 		console.endInput();
 	}
 
+	/*
+	 * https://gist.github.com/avilches/750151
+	 */
 	public static String bytesToHex(byte[] bytes) {
         StringBuffer result = new StringBuffer();
         for (byte byt : bytes) result.append(Integer.toString((byt & 0xff) + 0x100, 16).substring(1));

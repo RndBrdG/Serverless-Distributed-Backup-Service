@@ -1,6 +1,7 @@
 package serviceInterfaces;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -20,7 +21,7 @@ public class Backup {
 	private String owner; // used for hashing only
 	private ArrayList<Chunk> chunkFiles = new ArrayList<Chunk>();
 
-	public Backup() throws NoSuchAlgorithmException, UnsupportedEncodingException{
+	public Backup() throws NoSuchAlgorithmException, IOException{
 		this.filepath = new String(Console.getInputFromUser("Where is the file you want to back up?"));
 		this.replicationLevel = Integer.parseInt(new String(Console.getInputFromUser("What's the replication level?")));
 		this.owner = new String(Console.getInputFromUser("Who's the owner of the file?"));
@@ -33,7 +34,6 @@ public class Backup {
 		this.fileID = md.digest( toBeHashed.getBytes("UTF-8"));
 
 		splitFile();
-		System.out.println("-----");
 		sendingChunks();
 	}
 	
@@ -61,7 +61,7 @@ public class Backup {
 				int read = readStream.read(byteChunkPart, 0, readLength);
 				fileS -= read;
 				chunkNo+=1;
-
+				
 				Chunk part = new Chunk();
 				part.chuckNumber = chunkNo;
 				part.fileID = this.fileID;
@@ -75,15 +75,13 @@ public class Backup {
         }
 	}
 	
-	private void sendingChunks(){
+	private void sendingChunks() throws IOException{
 		String message = "PUTCHUNK " + "1.0 " + Main.bytesToHex(this.fileID);
-		
-		System.out.println(this.chunkFiles.size());
 		for(int i = 0; i < this.chunkFiles.size(); i++){
-			String messageCompleted = new String();
-			messageCompleted += message + " " + Integer.toString(this.chunkFiles.get(i).chuckNumber) + " " + Integer.toString(this.chunkFiles.get(i).replicationDegree) + 0xD + 0xA + 0xD + 0xA;
-			System.out.println(messageCompleted);
-			//System.out.println(messageCompl);
+			//String text  = new String(this.chunkFiles.get(i).text);
+			String messageCompleted = message + " " + Integer.toString(this.chunkFiles.get(i).chuckNumber) + " " + Integer.toString(this.chunkFiles.get(i).replicationDegree) + 0xD + 0xA + 0xD + 0xA + " " + this.chunkFiles.get(i).text;
+			//System.out.println(messageCompleted);
+			Main.MC.send(messageCompleted);
 		}
 	}
 }
