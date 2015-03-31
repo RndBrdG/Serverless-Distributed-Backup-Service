@@ -2,12 +2,12 @@ package serviceInterfaces;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 import console.Console;
+import main.Main;
 
 public class Backup {
 
@@ -19,26 +19,20 @@ public class Backup {
 	private String owner; // used for hashing only
 	private ArrayList<Chunk> chunkFiles = new ArrayList<Chunk>();
 
-	public Backup() throws NoSuchAlgorithmException, UnsupportedEncodingException{
+	public Backup() throws NoSuchAlgorithmException, IOException{
 		this.filepath = new String(Console.getInputFromUser("Where is the file you want to back up?"));
 		this.replicationLevel = Integer.parseInt(new String(Console.getInputFromUser("What's the replication level?")));
 		this.owner = new String(Console.getInputFromUser("Who's the owner of the file?"));
-		
 		getFileInfo();
 		
 		// CREATE HASH 
-		String toBeHashed = filename + owner + System.currentTimeMillis() + replicationLevel;
+		String toBeHashed = filename + "-" + owner + "-" + System.currentTimeMillis() + "-" + replicationLevel;
+		System.out.println(toBeHashed);
 		MessageDigest md = MessageDigest.getInstance("SHA-256");
-		md.update(toBeHashed.getBytes("UTF-16"));
-		this.fileID = md.digest();
-		
+		this.fileID = md.digest( toBeHashed.getBytes("UTF-8"));
+
 		splitFile();
-		
-		for(int i = 0; i < chunkFiles.size(); i++){
-			System.out.println("ChunkFile: " + chunkFiles.get(i).chuckNumber);
-			System.out.println("-----");
-			System.out.println(chunkFiles.get(i).text.toString());
-		}
+		sendingChunks();
 	}
 	
 	private void getFileInfo(){
@@ -57,24 +51,35 @@ public class Backup {
 		try {
 			readStream = new FileInputStream(bckFile);
 			while( fileS > 0){
-				System.out.println("ChunkFile: " + chunkNo);
 				if (fileS < readLength){
 					readLength = fileS;
 				}
+				System.out.println("ChunkFile " + chunkNo + " with " + readLength + " bytes.");
 				byteChunkPart = new byte[readLength];
 				int read = readStream.read(byteChunkPart, 0, readLength);
 				fileS -= read;
 				chunkNo+=1;
-
+				
 				Chunk part = new Chunk();
 				part.chuckNumber = chunkNo;
 				part.fileID = this.fileID;
 				part.replicationDegree = this.replicationLevel;
 				part.text = byteChunkPart;
+				this.chunkFiles.add(part);
 			}
 			readStream.close();
 		}catch (IOException exception) {
             exception.printStackTrace();
         }
+	}
+	
+	private void sendingChunks() throws IOException{
+		String message = "PUTCHUNK " + "1.0 " + Main.bytesToHex(this.fileID);
+		for(int i = 0; i < this.chunkFiles.size(); i++){
+			//String text  = new String(this.chunkFiles.get(i).text);
+			String messageCompleted = message + " " + Integer.toString(this.chunkFiles.get(i).chuckNumber) + " " + Integer.toString(this.chunkFiles.get(i).replicationDegree) + 0xD + 0xA + 0xD + 0xA + " " + this.chunkFiles.get(i).text;
+			//System.out.println(messageCompleted);
+			Main.mc.send(messageCompleted);
+		}
 	}
 }

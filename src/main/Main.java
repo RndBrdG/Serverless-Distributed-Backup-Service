@@ -17,6 +17,9 @@ public class Main {
 	public static Integer portMDB;
 	public static String ipMDR;
 	public static Integer portMDR;
+	public static MulticastChannel mc = null;
+	public static MulticastChannel mdb = null;
+	public static MulticastChannel mdr = null;
 	private static Console console = null;
 	private static serviceInterfaces.Backup backup = null;
 
@@ -34,11 +37,11 @@ public class Main {
 			portMDR = Integer.parseInt(args[5]);
 
 			// Subscrever os canais de multicast MC, MDB e MDR
-			MulticastChannel mc = new MulticastChannel(ipMC, portMC);
+			mc = new MulticastChannel(ipMC, portMC);
 			mc.join();
-			MulticastChannel mdb = new MulticastChannel(ipMDB, portMDB);
+			mdb = new MulticastChannel(ipMDB, portMDB);
 			mdb.join();
-			MulticastChannel mdr = new MulticastChannel(ipMDR, portMDR);
+			mdr = new MulticastChannel(ipMDR, portMDR);
 			mdr.join();
 
 			Queue<String> receivedMsgs = new LinkedList<String>(); // Fila com as mensagens escutadas no canal MC
@@ -50,6 +53,14 @@ public class Main {
 			switch (console.getUserOption()) {
 			case "BACKUP":
 				backup = new Backup();
+				break;
+			case "RESTORE":
+					String ex = mc.receive();
+					
+					String[] splitMessage = ex.split("\\s+");
+					String teste = splitMessage[5];
+					System.out.println(teste);
+					
 			}
 
 			// Parar o thread de escuta e fechar os canais de multicast
@@ -61,4 +72,13 @@ public class Main {
 
 		console.endInput();
 	}
+
+	/*
+	 * https://gist.github.com/avilches/750151
+	 */
+	public static String bytesToHex(byte[] bytes) {
+        StringBuffer result = new StringBuffer();
+        for (byte byt : bytes) result.append(Integer.toString((byt & 0xff) + 0x100, 16).substring(1));
+        return result.toString();
+    }
 }
