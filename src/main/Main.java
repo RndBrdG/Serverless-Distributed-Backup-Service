@@ -38,10 +38,12 @@ public class Main {
 			
 			console = new Console();
 			
-			switch(console.getUserOption()){
+			switch (console.getUserOption()) {
 			case "BACKUP":
 				backup = new Backup();
 			}
+			
+			MC.close();
 		}
 		
 		console.endInput();
