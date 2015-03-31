@@ -20,8 +20,7 @@ public class Main {
 	public static MulticastChannel mc = null;
 	public static MulticastChannel mdb = null;
 	public static MulticastChannel mdr = null;
-	private static Console console = null;
-	private static serviceInterfaces.Backup backup = null;
+	private static Console console = new Console();
 
 	public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
 		if (args.length != 6){
@@ -35,7 +34,7 @@ public class Main {
 			portMDB = Integer.parseInt(args[3]);
 			ipMDR = args[4];
 			portMDR = Integer.parseInt(args[5]);
-
+			
 			// Subscrever os canais de multicast MC, MDB e MDR
 			mc = new MulticastChannel(ipMC, portMC);
 			mc.join();
@@ -48,11 +47,11 @@ public class Main {
 			MulticastListener mcListener = new MulticastListener(mc, receivedMsgs);
 			mcListener.start(); // Iniciar o thread de escuta
 
-			console = new Console();
+			//console = new Console();
 
 			switch (console.getUserOption()) {
 			case "BACKUP":
-				backup = new Backup();
+				Backup bkp = new Backup();
 				break;
 			case "RESTORE":
 				String ex = mc.receive();
@@ -61,6 +60,8 @@ public class Main {
 				String teste = splitMessage[5];
 				System.out.println(teste);
 				break;
+			case "BYE":
+				break;
 			}
 
 			// Parar o thread de escuta e fechar os canais de multicast
@@ -68,9 +69,8 @@ public class Main {
 			mdr.close();
 			mdb.close();
 			mc.close();
+			console.endInput();
 		}
-
-		console.endInput();
 	}
 
 	/*

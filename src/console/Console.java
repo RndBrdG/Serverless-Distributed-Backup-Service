@@ -33,6 +33,7 @@ public class Console {
 				clearScreen();
 				break loop;
 			case "5":
+				userOption = "BYE";
 				clearScreen();
 				System.out.print("Bye!");
 				break loop;
@@ -66,6 +67,6 @@ public class Console {
 	}
 	
 	public void endInput(){
-		input.close();
+		this.input.close();
 	}
 }
