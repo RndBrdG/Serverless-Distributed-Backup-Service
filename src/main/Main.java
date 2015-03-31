@@ -55,12 +55,12 @@ public class Main {
 				backup = new Backup();
 				break;
 			case "RESTORE":
-					String ex = mc.receive();
-					
-					String[] splitMessage = ex.split("\\s+");
-					String teste = splitMessage[5];
-					System.out.println(teste);
-					
+				String ex = mc.receive();
+
+				String[] splitMessage = ex.split("\\s+");
+				String teste = splitMessage[5];
+				System.out.println(teste);
+				break;
 			}
 
 			// Parar o thread de escuta e fechar os canais de multicast
@@ -77,8 +77,8 @@ public class Main {
 	 * https://gist.github.com/avilches/750151
 	 */
 	public static String bytesToHex(byte[] bytes) {
-        StringBuffer result = new StringBuffer();
-        for (byte byt : bytes) result.append(Integer.toString((byt & 0xff) + 0x100, 16).substring(1));
-        return result.toString();
-    }
+		StringBuffer result = new StringBuffer();
+		for (byte byt : bytes) result.append(Integer.toString((byt & 0xff) + 0x100, 16).substring(1));
+		return result.toString();
+	}
 }
