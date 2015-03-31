@@ -8,6 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 import console.Console;
+import main.Main;
 
 public class Backup {
 
@@ -23,22 +24,17 @@ public class Backup {
 		this.filepath = new String(Console.getInputFromUser("Where is the file you want to back up?"));
 		this.replicationLevel = Integer.parseInt(new String(Console.getInputFromUser("What's the replication level?")));
 		this.owner = new String(Console.getInputFromUser("Who's the owner of the file?"));
-		
 		getFileInfo();
 		
 		// CREATE HASH 
-		String toBeHashed = filename + owner + System.currentTimeMillis() + replicationLevel;
+		String toBeHashed = filename + "-" + owner + "-" + System.currentTimeMillis() + "-" + replicationLevel;
+		System.out.println(toBeHashed);
 		MessageDigest md = MessageDigest.getInstance("SHA-256");
-		md.update(toBeHashed.getBytes("UTF-16"));
-		this.fileID = md.digest();
-		
+		this.fileID = md.digest( toBeHashed.getBytes("UTF-8"));
+
 		splitFile();
-		
-		for(int i = 0; i < chunkFiles.size(); i++){
-			System.out.println("ChunkFile: " + chunkFiles.get(i).chuckNumber);
-			System.out.println("-----");
-			System.out.println(chunkFiles.get(i).text.toString());
-		}
+		System.out.println("-----");
+		sendingChunks();
 	}
 	
 	private void getFileInfo(){
@@ -57,10 +53,10 @@ public class Backup {
 		try {
 			readStream = new FileInputStream(bckFile);
 			while( fileS > 0){
-				System.out.println("ChunkFile: " + chunkNo);
 				if (fileS < readLength){
 					readLength = fileS;
 				}
+				System.out.println("ChunkFile " + chunkNo + " with " + readLength + " bytes.");
 				byteChunkPart = new byte[readLength];
 				int read = readStream.read(byteChunkPart, 0, readLength);
 				fileS -= read;
@@ -71,10 +67,23 @@ public class Backup {
 				part.fileID = this.fileID;
 				part.replicationDegree = this.replicationLevel;
 				part.text = byteChunkPart;
+				this.chunkFiles.add(part);
 			}
 			readStream.close();
 		}catch (IOException exception) {
             exception.printStackTrace();
         }
+	}
+	
+	private void sendingChunks(){
+		String message = "PUTCHUNK " + "1.0 " + Main.bytesToHex(this.fileID);
+		
+		System.out.println(this.chunkFiles.size());
+		for(int i = 0; i < this.chunkFiles.size(); i++){
+			String messageCompleted = new String();
+			messageCompleted += message + " " + Integer.toString(this.chunkFiles.get(i).chuckNumber) + " " + Integer.toString(this.chunkFiles.get(i).replicationDegree) + 0xD + 0xA + 0xD + 0xA;
+			System.out.println(messageCompleted);
+			//System.out.println(messageCompl);
+		}
 	}
 }
