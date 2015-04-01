@@ -21,19 +21,19 @@ public class MulticastChannel {
 		socket.joinGroup(group);
 	}
 	
-	public void send(String msg) throws IOException {
-		DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.getBytes().length, group, port);
+	public void send(byte[] toSend) throws IOException {
+		DatagramPacket packet = new DatagramPacket(toSend, toSend.length, group, port);
 		socket.send(packet);
-		System.out.println("Sent: " + msg);
+		System.out.println("Sent: " + new String(toSend));
 	}
 	
-	public String receive() throws IOException {
-		byte[] strBuf = new byte[4096];
+	public int receive(byte[] data) throws IOException {
+		byte[] strBuf = new byte[8192];
 		DatagramPacket packet = new DatagramPacket(strBuf, strBuf.length);
 		socket.receive(packet);
-		String received = new String(packet.getData(), 0, packet.getLength());
-		System.out.println("Received: " + received);
-		return received;
+		data = packet.getData();
+		System.out.println("Received: " + new String(data));
+		return packet.getLength();
 	}
 	
 	public void close() throws IOException {

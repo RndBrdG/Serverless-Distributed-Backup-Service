@@ -44,7 +44,7 @@ public class Main {
 			mdr.join();
 
 			Queue<String> receivedMsgs = new LinkedList<String>(); // Fila com as mensagens escutadas no canal MC
-			MulticastListener mcListener = new MulticastListener(mc, receivedMsgs);
+			MCListener mcListener = new MCListener(mc, receivedMsgs);
 			mcListener.start(); // Iniciar o thread de escuta
 
 			//console = new Console();
@@ -54,7 +54,9 @@ public class Main {
 				Backup bkp = new Backup();
 				break;
 			case "RESTORE":
-				String ex = mc.receive();
+				byte[] received = null;
+				mc.receive(received);
+				String ex = new String(received);
 
 				String[] splitMessage = ex.split("\\s+");
 				String teste = splitMessage[5];

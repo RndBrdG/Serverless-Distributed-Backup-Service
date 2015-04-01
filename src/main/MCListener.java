@@ -6,19 +6,22 @@ import java.util.Queue;
 
 import serviceInterfaces.MulticastChannel;
 
-public class MulticastListener extends Thread {
-	private MulticastChannel MC;
+public class MCListener extends Thread {
+	private MulticastChannel mc;
 	private Queue<String> receivedMsgs;
 
-	public MulticastListener(MulticastChannel MC, Queue<String> receivedMsgs) {
-		this.MC = MC;
+	public MCListener(MulticastChannel MC, Queue<String> receivedMsgs) {
+		this.mc = MC;
 		this.receivedMsgs = receivedMsgs;
 	}
 
 	public void run() {
 		while (!isInterrupted()) {
 			try {
-				receivedMsgs.add(MC.receive());
+				byte[] received = null;
+				mc.receive(received);
+				
+				receivedMsgs.add(new String(received));
 			}
 			catch (SocketException e) {
 				break;

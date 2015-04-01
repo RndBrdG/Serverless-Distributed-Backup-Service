@@ -7,7 +7,7 @@ public class Console {
 	private static Scanner input = new Scanner(System.in);
 	private String userOption;
 	
-	public Console(){
+	public Console() {
 		start();
 	}
 	
@@ -67,6 +67,6 @@ public class Console {
 	}
 	
 	public void endInput(){
-		this.input.close();
+		input.close();
 	}
 }

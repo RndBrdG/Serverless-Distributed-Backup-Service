@@ -1,7 +1,9 @@
 package serviceInterfaces;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -24,7 +26,7 @@ public class Backup {
 		this.replicationLevel = Integer.parseInt(new String(Console.getInputFromUser("What's the replication level?")));
 		this.owner = new String(Console.getInputFromUser("Who's the owner of the file?"));
 		getFileInfo();
-		
+
 		// CREATE HASH 
 		String toBeHashed = filename + "-" + owner + "-" + System.currentTimeMillis() + "-" + replicationLevel;
 		System.out.println(toBeHashed);
@@ -34,13 +36,13 @@ public class Backup {
 		splitFile();
 		sendingChunks();
 	}
-	
+
 	private void getFileInfo(){
 		File bkpfile = new File(this.filepath);
 		this.filename = bkpfile.getName();
 		this.filesize = bkpfile.length();
 	}
-	
+
 	private void splitFile(){
 		File bckFile = new File(this.filepath);
 		FileInputStream readStream;
@@ -59,7 +61,7 @@ public class Backup {
 				int read = readStream.read(byteChunkPart, 0, readLength);
 				fileS -= read;
 				chunkNo+=1;
-				
+
 				Chunk part = new Chunk();
 				part.chuckNumber = chunkNo;
 				part.fileID = this.fileID;
@@ -69,16 +71,28 @@ public class Backup {
 			}
 			readStream.close();
 		}catch (IOException exception) {
-            exception.printStackTrace();
-        }
+			exception.printStackTrace();
+		}
 	}
-	
+
 	private void sendingChunks() throws IOException{
 		String message = "PUTCHUNK " + "1.0 " + Main.bytesToHex(this.fileID);
 		for(int i = 0; i < this.chunkFiles.size(); i++){
 			//String text  = new String(this.chunkFiles.get(i).text);
-			String messageCompleted = message + " " + Integer.toString(this.chunkFiles.get(i).chuckNumber) + " " + Integer.toString(this.chunkFiles.get(i).replicationDegree) + 0xD + 0xA + 0xD + 0xA + " " + this.chunkFiles.get(i).text;
-			//System.out.println(messageCompleted);
+			ByteArrayOutputStream msgStream = new ByteArrayOutputStream();
+			msgStream.write(message.getBytes());
+			msgStream.write(" ".getBytes());
+			msgStream.write(new Integer(this.chunkFiles.get(i).chuckNumber).byteValue());
+			msgStream.write(" ".getBytes());
+			msgStream.write(new Integer(this.chunkFiles.get(i).replicationDegree).byteValue());
+			msgStream.write((byte) 0x0d);
+			msgStream.write((byte) 0x0a);
+			msgStream.write((byte) 0x0d);
+			msgStream.write((byte) 0x0a);
+			msgStream.write(this.chunkFiles.get(i).text);
+			byte[] messageCompleted = msgStream.toByteArray();
+
+			System.out.println("ARRAY: " + new String(messageCompleted));
 			Main.mc.send(messageCompleted);
 		}
 	}
