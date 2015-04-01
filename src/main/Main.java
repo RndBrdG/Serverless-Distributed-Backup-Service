@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import serviceInterfaces.Backup;
+import serviceInterfaces.BackupChunk;
 import serviceInterfaces.MulticastChannel;
 import console.Console;
 
@@ -20,6 +21,8 @@ public class Main {
 	public static MulticastChannel mc = null;
 	public static MulticastChannel mdb = null;
 	public static MulticastChannel mdr = null;
+	private static BackupChunk bkpchunk = null;
+	private static Backup bkp = null;
 	private static Console console = new Console();
 
 	public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
@@ -47,18 +50,12 @@ public class Main {
 			MulticastListener mcListener = new MulticastListener(mc, receivedMsgs);
 			mcListener.start(); // Iniciar o thread de escuta
 
-			//console = new Console();
-
 			switch (console.getUserOption()) {
 			case "BACKUP":
-				Backup bkp = new Backup();
+				bkp = new Backup();
 				break;
 			case "RESTORE":
-				String ex = mc.receive();
-
-				String[] splitMessage = ex.split("\\s+");
-				String teste = splitMessage[5];
-				System.out.println(teste);
+				bkpchunk = new BackupChunk();
 				break;
 			case "BYE":
 				break;

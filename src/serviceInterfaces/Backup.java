@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import console.Console;
 import main.Main;
@@ -77,8 +78,8 @@ public class Backup {
 		String message = "PUTCHUNK " + "1.0 " + Main.bytesToHex(this.fileID);
 		for(int i = 0; i < this.chunkFiles.size(); i++){
 			//String text  = new String(this.chunkFiles.get(i).text);
-			String messageCompleted = message + " " + Integer.toString(this.chunkFiles.get(i).chuckNumber) + " " + Integer.toString(this.chunkFiles.get(i).replicationDegree) + 0xD + 0xA + 0xD + 0xA + " " + this.chunkFiles.get(i).text;
-			//System.out.println(messageCompleted);
+			String messageCompleted = message + " " + Integer.toString(this.chunkFiles.get(i).chuckNumber) + " " + Integer.toString(this.chunkFiles.get(i).replicationDegree) + " " + 0xD + 0xA + 0xD + 0xA + this.chunkFiles.get(i).text.toString();
+			System.out.println(messageCompleted);
 			Main.mc.send(messageCompleted);
 		}
 	}
