@@ -18,9 +18,8 @@ public class MCListener extends Thread {
 	public void run() {
 		while (!isInterrupted()) {
 			try {
-				byte[] received = null;
+				byte[] received = new byte[8192];
 				mc.receive(received);
-				
 				receivedMsgs.add(new String(received));
 			}
 			catch (SocketException e) {

@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 public class MulticastChannel {
 	private InetAddress group;
@@ -28,10 +29,8 @@ public class MulticastChannel {
 	}
 	
 	public int receive(byte[] data) throws IOException {
-		byte[] strBuf = new byte[8192];
-		DatagramPacket packet = new DatagramPacket(strBuf, strBuf.length);
+		DatagramPacket packet = new DatagramPacket(data, data.length);
 		socket.receive(packet);
-		data = packet.getData();
 		System.out.println("Received: " + new String(data));
 		return packet.getLength();
 	}

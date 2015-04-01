@@ -7,10 +7,9 @@ import main.Main;
 public class BackupChunk {
 
 	public BackupChunk() throws IOException{
-		byte[] received = null;
+		byte[] received = new byte[8192];
 		Main.mc.receive(received);
 		String ex = new String(received);
-		String[] splitMessage = ex.split("\\s+");
-		System.out.println(splitMessage);
+		System.out.println(ex);
 	}
 }

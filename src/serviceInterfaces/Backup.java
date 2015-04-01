@@ -77,15 +77,11 @@ public class Backup {
 	}
 
 	private void sendingChunks() throws IOException{
-		String message = "PUTCHUNK " + "1.0 " + Main.bytesToHex(this.fileID);
 		for(int i = 0; i < this.chunkFiles.size(); i++){
-			//String text  = new String(this.chunkFiles.get(i).text);
+			String chunkInformation  = new String();
+			chunkInformation = "PUTCHUNK " + "1.0 " + Main.bytesToHex(this.fileID) + " " + new Integer(this.chunkFiles.get(i).chuckNumber) + " " + new Integer(this.chunkFiles.get(i).replicationDegree);
 			ByteArrayOutputStream msgStream = new ByteArrayOutputStream();
-			msgStream.write(message.getBytes());
-			msgStream.write(" ".getBytes());
-			msgStream.write(new Integer(this.chunkFiles.get(i).chuckNumber).byteValue());
-			msgStream.write(" ".getBytes());
-			msgStream.write(new Integer(this.chunkFiles.get(i).replicationDegree).byteValue());
+			msgStream.write(chunkInformation.getBytes());
 			msgStream.write((byte) 0x0d);
 			msgStream.write((byte) 0x0a);
 			msgStream.write((byte) 0x0d);
@@ -93,7 +89,7 @@ public class Backup {
 			msgStream.write(this.chunkFiles.get(i).text);
 			byte[] messageCompleted = msgStream.toByteArray();
 
-			System.out.println("ARRAY: " + new String(messageCompleted));
+			//System.out.println("ARRAY: " + new String(messageCompleted));
 			Main.mc.send(messageCompleted);
 		}
 	}
