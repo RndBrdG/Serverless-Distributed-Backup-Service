@@ -5,6 +5,9 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+
 import main.Main;
 
 public class MulticastChannel {
@@ -34,7 +37,9 @@ public class MulticastChannel {
 		DatagramPacket packet = new DatagramPacket(data, data.length);
 		socket.receive(packet);
 		//System.out.println("Received: " + new String(data));
-		String logString = "Received from " + packet.getAddress().toString() + " : One chunk!" + '\n' + "------------------";
+		Date dNow = new Date();
+	    SimpleDateFormat time = new SimpleDateFormat ("hh:mm:ss dd.MM.yyyy");
+		String logString = "[" + time.format(dNow) + " ] | Received from " + packet.getAddress().toString() + " : One chunk!" + '\n' + "------------------";
 		Main.logfile.appendLog(logString);
 	}
 

@@ -1,5 +1,6 @@
 package main;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,8 +25,12 @@ public class MdbHandler extends Thread {
 				
 				FileOutputStream fileOut = null;
 				try {
+					File theDir = new File("chunks");
+					if (!theDir.exists())
+					        theDir.mkdir();
 					fileOut = new FileOutputStream("chunks/" + fileId + "/" + chunkNo);
 					fileOut.write(chunkBody);
+					fileOut.close();
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -36,6 +41,9 @@ public class MdbHandler extends Thread {
 	}
 	
 	private byte[] byteContents(String[] msg, String fileId, int chunkNo, int replication) {
+		for(int i = 0; i < msg.length; i++)
+			System.out.println(msg[i]);
+		
 		if (!msg[0].equals("PUTCHUNK") || !msg[1].equals("1.0")) return null;
 		fileId = msg[2];
 		chunkNo = Integer.parseInt(msg[3]);

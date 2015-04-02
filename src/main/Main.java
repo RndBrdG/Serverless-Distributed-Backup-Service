@@ -56,6 +56,7 @@ public class Main {
 			mdbListener = new MulticastListener(mdb);
 			mdbListener.start();
 			mdbHandler = new MdbHandler(mdbListener.getQueue());
+			mdbHandler.start();
 			//ArrayList<String> receivedMsgs = new ArrayList<String>(); // Fila com as mensagens escutadas no canal MC
 			//MulticastListener mcListener = new MulticastListener(mc, receivedMsgs);
 			//mcListener.start(); // Iniciar o thread de escuta
@@ -79,6 +80,7 @@ public class Main {
 			}
 			// Parar o thread de escuta e fechar os canais de multicast
 			//mcListener.interrupt();
+			mdbHandler.interrupt();
 			mdr.close();
 			mdb.close();
 			mc.close();
