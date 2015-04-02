@@ -65,7 +65,7 @@ public class Backup {
 				part.chuckNumber = chunkNo;
 				part.fileID = this.fileID;
 				part.replicationDegree = this.replicationLevel;
-				part.text = byteChunkPart;
+				part.content = byteChunkPart;
 				this.chunkFiles.add(part);
 			}
 			readStream.close();
@@ -84,7 +84,7 @@ public class Backup {
 			msgStream.write((byte) 0x0a);
 			msgStream.write((byte) 0x0d);
 			msgStream.write((byte) 0x0a);
-			msgStream.write(this.chunkFiles.get(i).text);
+			msgStream.write(this.chunkFiles.get(i).content);
 			byte[] messageCompleted = msgStream.toByteArray();
 
 			Main.mdb.send(messageCompleted);
