@@ -5,10 +5,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Queue;
 
-public class MDBHandler extends Thread {
+public class MdbHandler extends Thread {
 	private Queue<String> msgQueue;
 	
-	public MDBHandler(Queue<String> msgQueue) {
+	public MdbHandler(Queue<String> msgQueue) {
 		this.msgQueue = msgQueue;
 	}
 	

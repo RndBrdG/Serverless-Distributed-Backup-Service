@@ -2,16 +2,18 @@ package main;
 
 import java.io.IOException;
 import java.net.SocketException;
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+
 import serviceInterfaces.MulticastChannel;
 
 public class MulticastListener extends Thread {
 	private MulticastChannel mchannel;
-	private ArrayList<String> receivedMsgs;
+	private Queue<String> receivedMsgs;
 
 	public MulticastListener(MulticastChannel MC) {
 		this.mchannel = MC;
-		ArrayList<String> receivedMsgs = new ArrayList<String>();
+		Queue<String> receivedMsgs = new LinkedList<String>();
 		this.receivedMsgs = receivedMsgs;
 	}
 
@@ -34,7 +36,7 @@ public class MulticastListener extends Thread {
 		}
 	}
 	
-	public ArrayList<String> getQueue(){
+	public Queue<String> getQueue() {
 		return this.receivedMsgs;
 	}
 }

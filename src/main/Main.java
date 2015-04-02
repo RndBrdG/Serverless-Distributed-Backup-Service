@@ -19,9 +19,10 @@ public class Main {
 	public static MulticastChannel mc = null;
 	public static MulticastChannel mdb = null;
 	public static MulticastChannel mdr = null;
-	private static MulticastListener McListener = null;
-	private static MulticastListener MdbListener = null;
-	private static MulticastListener MdrListener = null;
+	private static MulticastListener mcListener = null;
+	private static MulticastListener mdbListener = null;
+	private static MulticastListener mdrListener = null;
+	private static MdbHandler mdbHandler = null;
 	private static BackupChunk bkpchunk = null;
 	private static Backup bkp = null;
 	private static Console console = new Console();
@@ -52,8 +53,9 @@ public class Main {
 			mdr = new MulticastChannel(ipMDR, portMDR);
 			mdr.join();
 
-			MdbListener = new MulticastListener(mdb);
-			MdbListener.start();
+			mdbListener = new MulticastListener(mdb);
+			mdbListener.start();
+			mdbHandler = new MdbHandler(mdbListener.getQueue());
 			//ArrayList<String> receivedMsgs = new ArrayList<String>(); // Fila com as mensagens escutadas no canal MC
 			//MulticastListener mcListener = new MulticastListener(mc, receivedMsgs);
 			//mcListener.start(); // Iniciar o thread de escuta
