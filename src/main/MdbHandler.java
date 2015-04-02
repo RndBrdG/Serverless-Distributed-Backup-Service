@@ -1,10 +1,8 @@
 package main;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Queue;
 
 import serviceInterfaces.Chunk;
@@ -15,25 +13,22 @@ public class MdbHandler extends Thread {
 	public MdbHandler(Queue<String> msgQueue) {
 		this.msgQueue = msgQueue;
 	}
-	
+
 	@Override
 	public void run() {
 		while (!isInterrupted()) {
 			if (!msgQueue.isEmpty()) {
 				String[] msg = msgQueue.poll().split("\\s+");
-				byteContents(msg);
+				updateByteContents(msg);
 				try {
-					File tmp = new File("CHUNKS" + File.separator + new String(currentChunk.fileID) + File.separator + currentChunk.chuckNumber + ".bin");
+					String filename = new String("chunks" + File.separator + new String(currentChunk.getFileId()) + File.separator + currentChunk.getChunkNumber());
+					File tmp = new File(filename);
 					tmp.getParentFile().mkdirs();
 					tmp.createNewFile();
-					
-					FileOutputStream out = new FileOutputStream("CHUNKS" + File.separator + new String(currentChunk.fileID) + File.separator + currentChunk.chuckNumber + ".bin");
-					out.write(currentChunk.content);
+
+					FileOutputStream out = new FileOutputStream(filename);
+					out.write(currentChunk.getContent());
 					out.close();
-					
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
 				// Write your data
 				/*FileOutputStream out = new FileOutputStream("chunks"+ File.separator"the-file-name");
@@ -43,24 +38,27 @@ public class MdbHandler extends Thread {
 				fileOut.write(currentChunk.content);
 				fileOut.flush();
 				fileOut.close();
-				*/ catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				 */ catch (IOException e) {
+					 e.printStackTrace();
+				 }
 			}
 		}
 	}
-	
-	private byte[] byteContents(String[] msg) {
-		if (!msg[0].equals("PUTCHUNK") || !msg[1].equals("1.0")) return null;
-		currentChunk = new Chunk();
-		currentChunk.chuckNumber = Integer.parseInt(msg[3]);
-		currentChunk.fileID = msg[2].getBytes();
-		currentChunk.replicationDegree = Integer.parseInt(msg[4]);
-		String stringBody = new String(msg[5]);
-		for (int i = 6; i < msg.length; ++i)
-			stringBody += " " + msg[i];
-		currentChunk.content = stringBody.getBytes();
-		return stringBody.getBytes();
+
+	private byte[] updateByteContents(String[] msg) {
+		try {
+			if (!msg[0].equals("PUTCHUNK") || !msg[1].equals("1.0")) return null;
+
+			String stringBody = new String(msg[5]);
+			for (int i = 6; i < msg.length; ++i)
+				stringBody += " " + msg[i];
+
+			currentChunk = new Chunk(msg[2].getBytes(), Integer.parseInt(msg[4]), Integer.parseInt(msg[3]), stringBody.getBytes());
+
+			return stringBody.getBytes();
+		}catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

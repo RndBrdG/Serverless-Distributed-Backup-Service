@@ -61,11 +61,7 @@ public class Backup {
 				fileS -= read;
 				chunkNo+=1;
 
-				Chunk part = new Chunk();
-				part.chuckNumber = chunkNo;
-				part.fileID = this.fileID;
-				part.replicationDegree = this.replicationLevel;
-				part.content = byteChunkPart;
+				Chunk part = new Chunk(fileID, replicationLevel, chunkNo, byteChunkPart);
 				this.chunkFiles.add(part);
 			}
 			readStream.close();
@@ -77,14 +73,14 @@ public class Backup {
 	private void sendingChunks() throws IOException{
 		for(int i = 0; i < this.chunkFiles.size(); i++){
 			String chunkInformation  = new String();
-			chunkInformation = "PUTCHUNK " + "1.0 " + Main.bytesToHex(this.fileID) + " " + new Integer(this.chunkFiles.get(i).chuckNumber) + " " + new Integer(this.chunkFiles.get(i).replicationDegree);
+			chunkInformation = "PUTCHUNK " + "1.0 " + Main.bytesToHex(this.fileID) + " " + new Integer(this.chunkFiles.get(i).getChunkNumber()) + " " + new Integer(this.chunkFiles.get(i).getReplicationDegree());
 			ByteArrayOutputStream msgStream = new ByteArrayOutputStream();
 			msgStream.write(chunkInformation.getBytes());
 			msgStream.write((byte) 0x0d);
 			msgStream.write((byte) 0x0a);
 			msgStream.write((byte) 0x0d);
 			msgStream.write((byte) 0x0a);
-			msgStream.write(this.chunkFiles.get(i).content);
+			msgStream.write(this.chunkFiles.get(i).getContent());
 			byte[] messageCompleted = msgStream.toByteArray();
 
 			Main.mdb.send(messageCompleted);
