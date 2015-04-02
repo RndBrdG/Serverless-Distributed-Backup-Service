@@ -48,6 +48,11 @@ public class MdbHandler extends Thread {
 		fileId = msg[2];
 		chunkNo = Integer.parseInt(msg[3]);
 		replication = Integer.parseInt(msg[4]);
-		return msg[5].substring(4).getBytes();
+		
+		String stringBody = new String(msg[5].substring(4));
+		for (int i = 6; i < msg.length; ++i)
+			stringBody += " " + msg[i];
+			
+		return stringBody.getBytes();
 	}
 }
