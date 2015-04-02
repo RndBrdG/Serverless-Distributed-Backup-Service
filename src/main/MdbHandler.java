@@ -46,19 +46,14 @@ public class MdbHandler extends Thread {
 	}
 
 	private byte[] updateByteContents(String[] msg) {
-		try {
-			if (!msg[0].equals("PUTCHUNK") || !msg[1].equals("1.0")) return null;
+		if (!msg[0].equals("PUTCHUNK") || !msg[1].equals("1.0")) return null;
 
-			String stringBody = new String(msg[5]);
-			for (int i = 6; i < msg.length; ++i)
-				stringBody += " " + msg[i];
+		String stringBody = new String(msg[5]);
+		for (int i = 6; i < msg.length; ++i)
+			stringBody += " " + msg[i];
 
-			currentChunk = new Chunk(msg[2].getBytes(), Integer.parseInt(msg[4]), Integer.parseInt(msg[3]), stringBody.getBytes());
+		currentChunk = new Chunk(msg[2].getBytes(), Integer.parseInt(msg[4]), Integer.parseInt(msg[3]), stringBody.getBytes());
 
-			return stringBody.getBytes();
-		}catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
+		return stringBody.getBytes();
 	}
 }
