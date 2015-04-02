@@ -23,6 +23,13 @@ public class MdbHandler extends Thread {
 				String[] msg = msgQueue.poll().split("\\s+");
 				byteContents(msg);
 				try {
+					File tmp = new File("CHUNKS" + File.separator + new String(currentChunk.fileID) + File.separator + currentChunk.chuckNumber + ".bin");
+					tmp.getParentFile().mkdirs();
+					tmp.createNewFile();
+					
+					FileOutputStream out = new FileOutputStream("CHUNKS" + File.separator + new String(currentChunk.fileID) + File.separator + currentChunk.chuckNumber + ".bin");
+					out.write(currentChunk.content);
+					out.close();
 					
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
