@@ -28,7 +28,7 @@ public class Backup {
 
 		// CREATE HASH 
 		String toBeHashed = filename + "-" + owner + "-" + System.currentTimeMillis() + "-" + replicationLevel;
-		System.out.println(toBeHashed);
+		//System.out.println(toBeHashed);
 		MessageDigest md = MessageDigest.getInstance("SHA-256");
 		this.fileID = md.digest( toBeHashed.getBytes("UTF-8"));
 
@@ -55,7 +55,7 @@ public class Backup {
 				if (fileS < readLength){
 					readLength = fileS;
 				}
-				System.out.println("ChunkFile " + chunkNo + " with " + readLength + " bytes.");
+				//System.out.println("ChunkFile " + chunkNo + " with " + readLength + " bytes.");
 				byteChunkPart = new byte[readLength];
 				int read = readStream.read(byteChunkPart, 0, readLength);
 				fileS -= read;
@@ -87,8 +87,7 @@ public class Backup {
 			msgStream.write(this.chunkFiles.get(i).text);
 			byte[] messageCompleted = msgStream.toByteArray();
 
-			//System.out.println("ARRAY: " + new String(messageCompleted));
-			Main.mc.send(messageCompleted);
+			Main.mdb.send(messageCompleted);
 		}
 	}
 }

@@ -8,7 +8,7 @@ public class Console {
 	private String userOption;
 	
 	public Console() {
-		start();
+		//start();
 	}
 	
 	public void start() { 
@@ -51,7 +51,7 @@ public class Console {
 		System.out.println("[5]Exit");
 	}
 	
-	private void clearScreen(){
+	public void clearScreen(){
 		for(int i = 0; i < 40; i++)
 			System.out.println();
 	}

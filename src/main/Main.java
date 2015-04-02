@@ -2,8 +2,6 @@ package main;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import serviceInterfaces.Backup;
 import serviceInterfaces.BackupChunk;
@@ -21,9 +19,13 @@ public class Main {
 	public static MulticastChannel mc = null;
 	public static MulticastChannel mdb = null;
 	public static MulticastChannel mdr = null;
+	private static MulticastListener McListener = null;
+	private static MulticastListener MdbListener = null;
+	private static MulticastListener MdrListener = null;
 	private static BackupChunk bkpchunk = null;
 	private static Backup bkp = null;
 	private static Console console = new Console();
+	public static Log logfile = null;
 
 	public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
 		if (args.length != 6){
@@ -31,6 +33,10 @@ public class Main {
 			return;
 		}
 		else {
+			
+			//log
+			logfile = new Log();
+
 			ipMC = args[0];
 			portMC = Integer.parseInt(args[1]);
 			ipMDB = args[2];
@@ -46,23 +52,29 @@ public class Main {
 			mdr = new MulticastChannel(ipMDR, portMDR);
 			mdr.join();
 
-			Queue<String> receivedMsgs = new LinkedList<String>(); // Fila com as mensagens escutadas no canal MC
-			MCListener mcListener = new MCListener(mc, receivedMsgs);
+			MdbListener = new MulticastListener(mdb);
+			MdbListener.start();
+			//ArrayList<String> receivedMsgs = new ArrayList<String>(); // Fila com as mensagens escutadas no canal MC
+			//MulticastListener mcListener = new MulticastListener(mc, receivedMsgs);
 			//mcListener.start(); // Iniciar o thread de escuta
-
-			switch (console.getUserOption()) {
-			case "BACKUP":
-				bkp = new Backup();
-				bkp = null;
-				break;
-			case "RESTORE":
-				bkpchunk = new BackupChunk();
-				bkpchunk = null;
-				break;
-			case "BYE":
-				break;
+			Boolean endlessLoop = true;
+			while(endlessLoop){
+				console.start();
+				switch (console.getUserOption()) {
+				case "BACKUP":
+					bkp = new Backup();
+					bkp = null;
+					break;
+				case "RESTORE":
+					bkpchunk = new BackupChunk();
+					bkpchunk = null;
+					break;
+				case "BYE":
+					endlessLoop = false;
+					break;
+				}
+				console.clearScreen();
 			}
-
 			// Parar o thread de escuta e fechar os canais de multicast
 			//mcListener.interrupt();
 			mdr.close();
