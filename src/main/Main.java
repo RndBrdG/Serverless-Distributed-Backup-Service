@@ -48,21 +48,23 @@ public class Main {
 
 			Queue<String> receivedMsgs = new LinkedList<String>(); // Fila com as mensagens escutadas no canal MC
 			MCListener mcListener = new MCListener(mc, receivedMsgs);
-			mcListener.start(); // Iniciar o thread de escuta
+			//mcListener.start(); // Iniciar o thread de escuta
 
 			switch (console.getUserOption()) {
 			case "BACKUP":
 				bkp = new Backup();
+				bkp = null;
 				break;
 			case "RESTORE":
 				bkpchunk = new BackupChunk();
+				bkpchunk = null;
 				break;
 			case "BYE":
 				break;
 			}
 
 			// Parar o thread de escuta e fechar os canais de multicast
-			mcListener.interrupt();
+			//mcListener.interrupt();
 			mdr.close();
 			mdb.close();
 			mc.close();
