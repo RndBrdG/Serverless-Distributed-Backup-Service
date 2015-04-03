@@ -3,6 +3,7 @@ package main;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Queue;
 
 import serviceInterfaces.Chunk;
@@ -10,6 +11,7 @@ import serviceInterfaces.Chunk;
 public class MdbHandler extends Thread {
 	private Queue<String> msgQueue;
 	private Chunk currentChunk;
+	
 	public MdbHandler(Queue<String> msgQueue) {
 		this.msgQueue = msgQueue;
 	}
@@ -41,7 +43,7 @@ public class MdbHandler extends Thread {
 		
 		String stringBody = new String(msg[5].substring(3));
 
-		currentChunk = new Chunk(msg[2].getBytes(), Integer.parseInt(msg[4]), Integer.parseInt(msg[3]), stringBody.getBytes());
+		currentChunk = new Chunk(msg[2].getBytes(), Integer.parseInt(msg[4]), Integer.parseInt(msg[3]), stringBody.getBytes(StandardCharsets.ISO_8859_1));
 		return stringBody.getBytes();
 	}
 }
