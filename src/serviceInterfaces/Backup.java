@@ -65,6 +65,9 @@ public class Backup {
 				this.chunkFiles.add(part);
 			}
 			readStream.close();
+			for( int i = 0; i < chunkFiles.size(); i++){
+				Main.logfile.appendLog("CHUNK " + chunkFiles.get(i).getChunkNumber() + " FILE SIZE: " + chunkFiles.get(i).getContent().length);
+			}
 		}catch (IOException exception) {
 			exception.printStackTrace();
 		}
@@ -82,7 +85,7 @@ public class Backup {
 			msgStream.write((byte) 0x0a);
 			msgStream.write(this.chunkFiles.get(i).getContent());
 			byte[] messageCompleted = msgStream.toByteArray();
-
+			Main.logfile.appendLog("[TO SEND] CHUNK FILE SIZE: " + chunkFiles.get(i).getContent().length);
 			Main.mdb.send(messageCompleted);
 		}
 	}

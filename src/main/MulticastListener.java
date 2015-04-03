@@ -20,10 +20,10 @@ public class MulticastListener extends Thread {
 	public void run() {
 		while (!isInterrupted()) {
 			try {
-				byte[] received = new byte[8192];
+				byte[] buf = new byte[65536];
 				//System.out.println("Listener");
-				mchannel.receive(received);
-				receivedMsgs.add(new String(received));
+				byte[] data = mchannel.receive(buf);
+				receivedMsgs.add(new String(data));
 				//System.out.println(new String(received));
 			}
 			catch (SocketException e) {
