@@ -21,10 +21,9 @@ public class MulticastListener extends Thread {
 		while (!isInterrupted()) {
 			try {
 				byte[] buf = new byte[65536];
-				//System.out.println("Listener");
+				
 				byte[] data = mchannel.receive(buf);
 				receivedMsgs.add(new String(data));
-				//System.out.println(new String(received));
 			}
 			catch (SocketException e) {
 				break;

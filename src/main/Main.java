@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 import serviceInterfaces.Backup;
-import serviceInterfaces.BackupChunk;
 import serviceInterfaces.MulticastChannel;
 import console.Console;
 
@@ -23,11 +22,13 @@ public class Main {
 	private static MulticastListener mdbListener = null;
 	private static MulticastListener mdrListener = null;
 	private static MdbHandler mdbHandler = null;
-	private static BackupChunk bkpchunk = null;
+	private static McHandler mcHandler = null;
 	private static Backup bkp = null;
 	private static Console console = new Console();
 	public static Log logfile = null;
-
+	public static Log ErrorsLog = null;
+	
+	
 	public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
 		if (args.length != 6){
 			System.out.println("Usage: java <ipMC> <portMC> <ipMDB> <portMDB> <ipMDR> <portMDR>");
@@ -36,8 +37,9 @@ public class Main {
 		else {
 			
 			//log
-			logfile = new Log();
-
+			logfile = new Log("log.txt");
+			ErrorsLog = new Log("errors.txt");
+			
 			ipMC = args[0];
 			portMC = Integer.parseInt(args[1]);
 			ipMDB = args[2];
@@ -57,9 +59,12 @@ public class Main {
 			mdbListener.start();
 			mdbHandler = new MdbHandler(mdbListener.getQueue());
 			mdbHandler.start();
-			//ArrayList<String> receivedMsgs = new ArrayList<String>(); // Fila com as mensagens escutadas no canal MC
-			//MulticastListener mcListener = new MulticastListener(mc, receivedMsgs);
-			//mcListener.start(); // Iniciar o thread de escuta
+			
+			mcListener = new MulticastListener(mc);
+			mcListener.start();
+			mcHandler = new McHandler(mcListener.getQueue());
+			mcHandler.start();
+
 			Boolean endlessLoop = true;
 			while(endlessLoop){
 				console.start();
@@ -69,8 +74,6 @@ public class Main {
 					bkp = null;
 					break;
 				case "RESTORE":
-					bkpchunk = new BackupChunk();
-					bkpchunk = null;
 					break;
 				case "BYE":
 					endlessLoop = false;
@@ -80,6 +83,7 @@ public class Main {
 			}
 			// Parar o thread de escuta e fechar os canais de multicast
 			//mcListener.interrupt();
+			mcHandler.interrupt();
 			mdbHandler.interrupt();
 			mdr.close();
 			mdb.close();
@@ -95,5 +99,9 @@ public class Main {
 		StringBuffer result = new StringBuffer();
 		for (byte byt : bytes) result.append(Integer.toString((byt & 0xff) + 0x100, 16).substring(1));
 		return result.toString();
+	}
+	
+	public static int getNumberOfConfirmation(){
+		return Main.mcHandler.getNumberOfconf();
 	}
 }

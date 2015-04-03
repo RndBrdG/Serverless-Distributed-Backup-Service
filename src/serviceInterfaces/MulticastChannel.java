@@ -14,11 +14,13 @@ import main.Main;
 public class MulticastChannel {
 	private InetAddress group;
 	private int port;
+	private int numberOfConfirmations;
 	private MulticastSocket socket;
 
 	public MulticastChannel(String ip, int port) throws UnknownHostException {
 		group = InetAddress.getByName(ip);
 		this.port = port;
+		this.numberOfConfirmations = 0;
 	}
 
 	public void join() throws IOException {
@@ -29,9 +31,8 @@ public class MulticastChannel {
 	public void send(byte[] toSend) throws IOException {
 		DatagramPacket packet = new DatagramPacket(toSend, toSend.length, group, port);
 		socket.send(packet);
-		//System.out.println("Sent: " + new String(toSend));
-		String logString = "Sent from " + packet.getAddress().toString() + " : one chunk!" + '\n' + "------------------";
-		Main.logfile.appendLog(logString);
+		String logString = "[" + packet.getAddress().toString() + "] : one chunk!";
+		Main.logfile.appendLog("[SENDING MESSAGE] > " + logString);
 	}
 
 	public byte[] receive(byte[] buf) throws IOException {
@@ -40,8 +41,8 @@ public class MulticastChannel {
 		byte[] data = Arrays.copyOfRange(packet.getData(), 0, packet.getLength());
 		Date dNow = new Date();
 	    SimpleDateFormat time = new SimpleDateFormat ("hh:mm:ss dd.MM.yyyy");
-		String logString = "[" + time.format(dNow) + " ] | Received from " + packet.getAddress().toString() + " : One chunk!" + '\n' + "------------------";
-		Main.logfile.appendLog(logString);
+		String logString = "[" + time.format(dNow) + " ] * " + packet.getAddress().toString() + "!";
+		Main.logfile.appendLog("[RECEIVED MESSAGE] > " + logString);
 		return data;
 	}
 
