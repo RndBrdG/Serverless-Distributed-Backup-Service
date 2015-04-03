@@ -19,7 +19,7 @@ public class Backup {
 	private Integer replicationLevel; 
 	private String owner; // used for hashing only
 	private ArrayList<Chunk> chunkFiles = new ArrayList<Chunk>();
-
+	
 	public Backup() throws NoSuchAlgorithmException, IOException{
 		this.filepath = new String(Console.getInputFromUser("Where is the file you want to back up?"));
 		this.replicationLevel = Integer.parseInt(new String(Console.getInputFromUser("What's the replication level?")));
@@ -52,10 +52,8 @@ public class Backup {
 		try {
 			readStream = new FileInputStream(bckFile);
 			while( fileS > 0){
-				if (fileS < readLength){
+				if (fileS < readLength)
 					readLength = fileS;
-				}
-				//System.out.println("ChunkFile " + chunkNo + " with " + readLength + " bytes.");
 				byteChunkPart = new byte[readLength];
 				int read = readStream.read(byteChunkPart, 0, readLength);
 				fileS -= read;
@@ -65,16 +63,18 @@ public class Backup {
 				this.chunkFiles.add(part);
 			}
 			readStream.close();
-			for( int i = 0; i < chunkFiles.size(); i++){
-				Main.logfile.appendLog("CHUNK " + chunkFiles.get(i).getChunkNumber() + " FILE SIZE: " + chunkFiles.get(i).getContent().length);
-			}
+
 		}catch (IOException exception) {
 			exception.printStackTrace();
 		}
 	}
 
 	private void sendingChunks() throws IOException{
+		long Initial_t, current_t;
+		long wait_multiplier = 1;
+		int tries = 0;
 		for(int i = 0; i < this.chunkFiles.size(); i++){
+			Main.logfile.appendLog("-------- CHUNK " + Main.bytesToHex(this.fileID) + " No." + this.chunkFiles.get(i).getChunkNumber() + " --------" + '\n');
 			String chunkInformation  = new String();
 			chunkInformation = "PUTCHUNK " + "1.0 " + Main.bytesToHex(this.fileID) + " " + new Integer(this.chunkFiles.get(i).getChunkNumber()) + " " + new Integer(this.chunkFiles.get(i).getReplicationDegree());
 			ByteArrayOutputStream msgStream = new ByteArrayOutputStream();
@@ -85,8 +85,24 @@ public class Backup {
 			msgStream.write((byte) 0x0a);
 			msgStream.write(this.chunkFiles.get(i).getContent());
 			byte[] messageCompleted = msgStream.toByteArray();
-			Main.logfile.appendLog("[TO SEND] CHUNK FILE SIZE: " + chunkFiles.get(i).getContent().length);
-			Main.mdb.send(messageCompleted);
+			do{
+				Main.mdb.send(messageCompleted);
+				Initial_t = System.currentTimeMillis();
+				current_t = System.currentTimeMillis();
+				while( current_t < Initial_t + 500*wait_multiplier)
+					current_t = System.currentTimeMillis();
+				Main.logfile.appendLog('\n' + "[INFORMATION] > CHUNK REPLICATION: " + this.replicationLevel + " | NUMBERFCONFIRMATIONS: " + Main.getNumberOfConfirmation());
+				if ( Main.getNumberOfConfirmation() >= this.replicationLevel) break;
+				else {
+					wait_multiplier += 1;
+					tries += 1;
+					if (tries > 3) {
+						Main.ErrorsLog.appendLog("There was something wrong. We tried 3 times to get it right, but we didn't have good answers");
+						break;
+					}
+				}
+			}while(true);
 		}
+		Main.logfile.appendLog('\n'+"-------- END OF CHUNK --------\n"+'\n');
 	}
 }
