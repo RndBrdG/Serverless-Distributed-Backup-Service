@@ -32,6 +32,7 @@ public class Backup {
 		MessageDigest md = MessageDigest.getInstance("SHA-256");
 		this.fileID = md.digest( toBeHashed.getBytes("UTF-8"));
 
+		Main.files.put(this.filename, Main.bytesToHex(this.fileID));
 		splitFile();
 		sendingChunks();
 	}
@@ -97,7 +98,7 @@ public class Backup {
 					wait_multiplier += 1;
 					tries += 1;
 					if (tries > 3) {
-						Main.ErrorsLog.appendLog("There was something wrong. We tried 3 times to get it right, but we didn't have good answers");
+						Main.errorsLog.appendLog("There was something wrong. We tried 3 times to get it right, but we didn't have good answers");
 						break;
 					}
 				}

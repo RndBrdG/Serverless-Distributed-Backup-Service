@@ -1,10 +1,14 @@
 package main;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
 import serviceInterfaces.Backup;
 import serviceInterfaces.MulticastChannel;
+import serviceInterfaces.Restore;
 import console.Console;
 
 public class Main {
@@ -23,9 +27,13 @@ public class Main {
 	private static MdbHandler mdbHandler = null;
 	private static McHandler mcHandler = null;
 	private static Backup bkp = null;
+	private static Restore rst = null;
 	private static Console console = new Console();
 	public static Log logfile = null;
-	public static Log ErrorsLog = null;
+	public static Log errorsLog = null;
+	public static Log backedUpFiles = null;
+	
+	public static Map<String,String> files = null;
 	public static SpaceManager spaceManager = null;
 
 	public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
@@ -33,10 +41,14 @@ public class Main {
 			System.out.println("Usage: java <ipMC> <portMC> <ipMDB> <portMDB> <ipMDR> <portMDR>");
 			return;
 		}
-		else {
+		else {			
+			files = new HashMap<String, String>();
+			
 			//log
 			logfile = new Log("log.txt");
-			ErrorsLog = new Log("errors.txt");
+			errorsLog = new Log("errors.txt");
+			backedUpFiles = new Log("backedUpFiles.txt");
+			backedUpFiles.readLog();
 			
 			spaceManager = new SpaceManager(5 * 1024); // Espaço disponível para backups, em KB
 			spaceManager.start();
@@ -75,18 +87,20 @@ public class Main {
 					bkp = null;
 					break;
 				case "RESTORE":
+					rst = new Restore();
+					rst.start();
 					break;
 				case "SETSPACE":
 					spaceManager.setAvailableSpace(Integer.parseInt(Console.getInputFromUser("How much space should be dedicated to store other computers' backups?")));
 					break;
 				case "BYE":
 					endlessLoop = false;
+					insertDataOnFileLog();
 					break;
 				}
-				console.clearScreen();
 			}
+			
 			// Parar o thread de escuta e fechar os canais de multicast
-			//mcListener.interrupt();
 			mcHandler.interrupt();
 			mdbHandler.interrupt();
 			mdr.close();
@@ -107,5 +121,12 @@ public class Main {
 
 	public static int getNumberOfConfirmation(){
 		return Main.mcHandler.getNumberOfconf();
+	}
+	
+	private static void insertDataOnFileLog() throws FileNotFoundException{
+		Main.backedUpFiles.clearFile();
+		for (Map.Entry<String, String> key : Main.files.entrySet()) {
+			Main.backedUpFiles.appendLog( key.getKey() + " " + key.getValue());
+		}
 	}
 }
