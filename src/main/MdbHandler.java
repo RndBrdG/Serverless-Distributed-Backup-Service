@@ -26,7 +26,7 @@ public class MdbHandler extends Thread {
 				boolean isValid = updateByteContents(msg);
 				if (isValid){
 					try {
-						String filename = new String("chunks" + File.separator + new String(currentChunk.getFileId()) + File.separator + currentChunk.getChunkNumber());
+						String filename = new String("CHUNKS" + File.separator + new String(currentChunk.getFileId()) + File.separator + currentChunk.getChunkNumber());
 						File tmp = new File(filename);
 						if ( !tmp.getParentFile().exists())
 							tmp.getParentFile().mkdirs();

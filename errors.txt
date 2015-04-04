@@ -1,0 +1,13 @@
+==================
+   errors.txt FILE     
+==================
+null
+
+Message not properly written
+Message not properly written
+FicheiroTeste.txt e1a238d8c58210e5185484a1c634f30edbf498cb3de60fa63fe4f39a11f2ccc3
+
+GETCHUNK 1.0 e1a238d8c58210e5185484a1c634f30edbf498cb3de60fa63fe4f39a11f2ccc3 1 
+
+
+Message not properly written

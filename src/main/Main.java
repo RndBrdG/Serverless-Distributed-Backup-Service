@@ -1,9 +1,15 @@
 package main;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.text.html.HTMLDocument.Iterator;
 
 import serviceInterfaces.Backup;
+import serviceInterfaces.Restore;
 import serviceInterfaces.MulticastChannel;
 import console.Console;
 
@@ -24,9 +30,13 @@ public class Main {
 	private static MdbHandler mdbHandler = null;
 	private static McHandler mcHandler = null;
 	private static Backup bkp = null;
+	private static Restore rst = null;
 	private static Console console = new Console();
 	public static Log logfile = null;
-	public static Log ErrorsLog = null;
+	public static Log errorsLog = null;
+	public static Log backedUpFiles = null;
+	
+	public static Map<String,String> files = null;
 	
 	
 	public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
@@ -36,9 +46,13 @@ public class Main {
 		}
 		else {
 			
+			files = new HashMap<String, String>();
+			
 			//log
 			logfile = new Log("log.txt");
-			ErrorsLog = new Log("errors.txt");
+			errorsLog = new Log("errors.txt");
+			backedUpFiles = new Log("backedUpFiles.txt");
+			backedUpFiles.readLog();
 			
 			ipMC = args[0];
 			portMC = Integer.parseInt(args[1]);
@@ -74,15 +88,17 @@ public class Main {
 					bkp = null;
 					break;
 				case "RESTORE":
+					rst = new Restore();
+					rst.start();
 					break;
 				case "BYE":
 					endlessLoop = false;
+					insertDataOnFileLog();
 					break;
 				}
-				console.clearScreen();
 			}
+			
 			// Parar o thread de escuta e fechar os canais de multicast
-			//mcListener.interrupt();
 			mcHandler.interrupt();
 			mdbHandler.interrupt();
 			mdr.close();
@@ -103,5 +119,12 @@ public class Main {
 	
 	public static int getNumberOfConfirmation(){
 		return Main.mcHandler.getNumberOfconf();
+	}
+	
+	private static void insertDataOnFileLog() throws FileNotFoundException{
+		Main.backedUpFiles.clearFile();
+		for (Map.Entry<String, String> key : Main.files.entrySet()) {
+			Main.backedUpFiles.appendLog( key.getKey() + " " + key.getValue());
+		}
 	}
 }
