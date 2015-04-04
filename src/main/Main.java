@@ -8,7 +8,6 @@ import serviceInterfaces.MulticastChannel;
 import console.Console;
 
 public class Main {
-
 	public static String ipMC;
 	public static Integer portMC;
 	public static String ipMDB;
@@ -27,26 +26,28 @@ public class Main {
 	private static Console console = new Console();
 	public static Log logfile = null;
 	public static Log ErrorsLog = null;
-	
-	
+	public static SpaceManager spaceManager = null;
+
 	public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
-		if (args.length != 6){
+		if (args.length != 6) {
 			System.out.println("Usage: java <ipMC> <portMC> <ipMDB> <portMDB> <ipMDR> <portMDR>");
 			return;
 		}
 		else {
-			
 			//log
 			logfile = new Log("log.txt");
 			ErrorsLog = new Log("errors.txt");
 			
+			spaceManager = new SpaceManager(5 * 1024); // Espaço disponível para backups, em KB
+			spaceManager.start();
+
 			ipMC = args[0];
 			portMC = Integer.parseInt(args[1]);
 			ipMDB = args[2];
 			portMDB = Integer.parseInt(args[3]);
 			ipMDR = args[4];
 			portMDR = Integer.parseInt(args[5]);
-			
+
 			// Subscrever os canais de multicast MC, MDB e MDR
 			mc = new MulticastChannel(ipMC, portMC);
 			mc.join();
@@ -59,7 +60,7 @@ public class Main {
 			mdbListener.start();
 			mdbHandler = new MdbHandler(mdbListener.getQueue());
 			mdbHandler.start();
-			
+
 			mcListener = new MulticastListener(mc);
 			mcListener.start();
 			mcHandler = new McHandler(mcListener.getQueue());
@@ -74,6 +75,9 @@ public class Main {
 					bkp = null;
 					break;
 				case "RESTORE":
+					break;
+				case "SETSPACE":
+					spaceManager.setAvailableSpace(Integer.parseInt(Console.getInputFromUser("How much space should be dedicated to store other computers' backups?")));
 					break;
 				case "BYE":
 					endlessLoop = false;
@@ -100,7 +104,7 @@ public class Main {
 		for (byte byt : bytes) result.append(Integer.toString((byt & 0xff) + 0x100, 16).substring(1));
 		return result.toString();
 	}
-	
+
 	public static int getNumberOfConfirmation(){
 		return Main.mcHandler.getNumberOfconf();
 	}

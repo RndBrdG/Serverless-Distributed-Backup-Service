@@ -76,7 +76,7 @@ public class Backup {
 		for(int i = 0; i < this.chunkFiles.size(); i++){
 			Main.logfile.appendLog("-------- CHUNK " + Main.bytesToHex(this.fileID) + " No." + this.chunkFiles.get(i).getChunkNumber() + " --------" + '\n');
 			String chunkInformation  = new String();
-			chunkInformation = "PUTCHUNK " + "1.0 " + Main.bytesToHex(this.fileID) + " " + new Integer(this.chunkFiles.get(i).getChunkNumber()) + " " + new Integer(this.chunkFiles.get(i).getReplicationDegree());
+			chunkInformation = "PUTCHUNK " + "1.0 " + Main.bytesToHex(this.fileID) + " " + new Integer(this.chunkFiles.get(i).getChunkNumber()) + " " + new Integer(this.chunkFiles.get(i).getTargetReplicationDegree());
 			ByteArrayOutputStream msgStream = new ByteArrayOutputStream();
 			msgStream.write(chunkInformation.getBytes());
 			msgStream.write((byte) 0x0d);

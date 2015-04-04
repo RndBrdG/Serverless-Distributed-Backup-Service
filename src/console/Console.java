@@ -5,13 +5,9 @@ import java.util.Scanner;
 public class Console {
 
 	private static Scanner input = new Scanner(System.in);
-	private String userOption;
+	private String userOption = "";
 	
-	public Console() {
-		//start();
-	}
-	
-	public void start() { 
+	public void start() {
 		loop: do {
 			startingMenu();
 
@@ -29,7 +25,7 @@ public class Console {
 				clearScreen();
 				break loop;
 			case "4":
-				userOption = "FREE";
+				userOption = "SETSPACE";
 				clearScreen();
 				break loop;
 			case "5":
@@ -42,31 +38,31 @@ public class Console {
 		} while (true);
 	}
 	
-	private void startingMenu(){
+	private void startingMenu() {
 		System.out.println("What do you want to do?");
-		System.out.println("[1]Backup File");
-		System.out.println("[2]Restore File");
-		System.out.println("[3]Delete File");
-		System.out.println("[4]Free Space");
-		System.out.println("[5]Exit");
+		System.out.println("[1] Backup file");
+		System.out.println("[2] Restore file");
+		System.out.println("[3] Remove file from backups");
+		System.out.println("[4] Set available space for backups");
+		System.out.println("[5] Exit");
 	}
 	
-	public void clearScreen(){
+	public void clearScreen() {
 		for(int i = 0; i < 40; i++)
 			System.out.println();
 	}
 
-	public static String getInputFromUser(String message){
+	public static String getInputFromUser(String message) {
 		System.out.println(message);
 		message = new String(input.nextLine());
 		return message;
 	}
 	
-	public String getUserOption(){
+	public String getUserOption() {
 		return this.userOption;
 	}
 	
-	public void endInput(){
+	public void endInput() {
 		input.close();
 	}
 }

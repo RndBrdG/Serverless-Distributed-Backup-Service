@@ -28,7 +28,7 @@ public class MdbHandler extends Thread {
 					try {
 						String filename = new String("chunks" + File.separator + new String(currentChunk.getFileId()) + File.separator + currentChunk.getChunkNumber());
 						File tmp = new File(filename);
-						if ( !tmp.getParentFile().exists())
+						if (!tmp.getParentFile().exists())
 							tmp.getParentFile().mkdirs();
 						tmp.createNewFile();
 						
@@ -36,6 +36,7 @@ public class MdbHandler extends Thread {
 						out.write(currentChunk.getContent());
 						out.close();
 						sendConfirmationMessage(msg);
+						Main.spaceManager.addChunk(currentChunk);
 					} catch (IOException e) {
 						 e.printStackTrace();
 					 }
@@ -54,7 +55,7 @@ public class MdbHandler extends Thread {
 	}
 	
 	private void sendConfirmationMessage(String[] received) throws IOException{
-		String confirmationMsg  = new String();
+		String confirmationMsg = new String();
 		confirmationMsg += "STORED " + received[1] + " " + received[2] + " " + received[3] + " ";
 		ByteArrayOutputStream msgStream = new ByteArrayOutputStream();
 		msgStream.write(confirmationMsg.getBytes());
