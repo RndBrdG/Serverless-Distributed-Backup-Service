@@ -24,7 +24,8 @@ public class MulticastListener extends Thread {
 				byte[] buf = new byte[65536];
 				
 				byte[] data = multicastChannel.receive(buf);
-				receivedMsgs.add(new String(data, StandardCharsets.ISO_8859_1));
+				if (data != null)
+					receivedMsgs.add(new String(data, StandardCharsets.ISO_8859_1));
 			}
 			catch (SocketException e) {
 				break;

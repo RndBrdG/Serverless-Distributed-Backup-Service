@@ -3,7 +3,9 @@ package serviceInterfaces;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Date;
@@ -38,12 +40,17 @@ public class MulticastChannel {
 	public byte[] receive(byte[] buf) throws IOException {
 		DatagramPacket packet = new DatagramPacket(buf, buf.length);
 		socket.receive(packet);
-		byte[] data = Arrays.copyOfRange(packet.getData(), 0, packet.getLength());
-		Date dNow = new Date();
-	    SimpleDateFormat time = new SimpleDateFormat ("hh:mm:ss dd.MM.yyyy");
-		String logString = "[" + time.format(dNow) + " ] * " + packet.getAddress().toString() + "!";
-		Main.logfile.appendLog("[RECEIVED MESSAGE] > " + logString);
-		return data;
+		if ( socket.getLocalAddress().toString().equals(InetAddress.getLocalHost().getHostAddress().toString()))  {
+			return null;
+		}
+		else {
+			byte[] data = Arrays.copyOfRange(packet.getData(), 0, packet.getLength());
+			Date dNow = new Date();
+		    SimpleDateFormat time = new SimpleDateFormat ("hh:mm:ss dd.MM.yyyy");
+			String logString = "[" + time.format(dNow) + " ] * " + packet.getAddress().toString() + "!";
+			Main.logfile.appendLog("[RECEIVED MESSAGE] > " + logString);
+			return data;
+		}
 	}
 
 	public void close() throws IOException {
