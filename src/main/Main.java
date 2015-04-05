@@ -26,6 +26,7 @@ public class Main {
 	private static MulticastListener mdrListener = null;
 	private static MdbHandler mdbHandler = null;
 	private static McHandler mcHandler = null;
+	private static MdrHandler mdrHandler = null;
 	private static Backup bkp = null;
 	private static Restore rst = null;
 	private static Console console = new Console();
@@ -77,6 +78,11 @@ public class Main {
 			mcListener.start();
 			mcHandler = new McHandler(mcListener.getQueue());
 			mcHandler.start();
+			
+			mdrListener = new MulticastListener(mdr);
+			mdrListener.start();
+			mdrHandler = new MdrHandler(mdrListener.getQueue());
+			mdrHandler.start();
 
 			Boolean endlessLoop = true;
 			while(endlessLoop){
@@ -101,6 +107,7 @@ public class Main {
 			}
 			
 			// Parar o thread de escuta e fechar os canais de multicast
+			mdrHandler.interrupt();
 			mcHandler.interrupt();
 			mdbHandler.interrupt();
 			mdr.close();
@@ -121,6 +128,10 @@ public class Main {
 
 	public static int getNumberOfConfirmation(){
 		return Main.mcHandler.getNumberOfconf();
+	}
+	
+	public static void resetNumberOfConfirmation(){
+		Main.mcHandler.resetNumberOfConf();
 	}
 	
 	private static void insertDataOnFileLog() throws FileNotFoundException{

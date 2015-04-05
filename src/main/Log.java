@@ -41,7 +41,7 @@ public class Log {
 	        line = br.readLine();
 	        while (line != null) {
 	            String[] msg = line.split(" ");
-	            Main.files.put(msg[0], msg[1]);
+	            Main.files.put(msg[0].toLowerCase(), msg[1] + " " + msg[2]);
 	            line = br.readLine();
 	        }
 	    } finally {

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Queue;
+import java.util.Random;
 
 public class McHandler extends Thread {
 		private Queue<String> msgQueue;
@@ -37,14 +38,13 @@ public class McHandler extends Thread {
 							byteChunkPart = new byte[(int) readLength];
 							int read = readStream.read(byteChunkPart, 0, (int)readLength);
 							readStream.close();
-							
 							sendChunk( createChunkMessage(byteChunkPart,msg[2],msg[3]));
 						}catch (IOException exception) {
 							exception.printStackTrace();
 						}
 					}
 					else if (isValid && !restore){}
-					else Main.errorsLog.appendLog("Message not properly written. FILE ID : " + msg[2]);
+					else Main.errorsLog.appendLog("Message is not properly written. FILE ID : " + msg[2]);
 				}
 			}
 		}
@@ -52,10 +52,11 @@ public class McHandler extends Thread {
 		private boolean updateByteContents(String[] msg) {
 			if (msg[0].equals("STORED") && msg[1].equals("1.0")) {
 				this.numberOfConfirmations += 1;
-				restore = false;
+				this.restore = false;
 			}
 			else if (msg[0].equals("GETCHUNK") && msg[1].equals("1.0")) {
-				restore = true && fileExists(msg);
+				this.restore = true;
+				return fileExists(msg);
 			}
 			else return false;
 
@@ -63,20 +64,19 @@ public class McHandler extends Thread {
 		}
 		
 		private boolean fileExists(String[] msg){
-			File file = new File("BACKUP" + File.separator + msg[2] + File.separator + msg[3]);
+			File file = new File("CHUNKS" + File.separator + msg[2] + File.separator + msg[3]);
 			return file.exists();
 		}
 		
 		public int getNumberOfconf(){
 			return this.numberOfConfirmations;
 		}
+		
+		public void resetNumberOfConf(){
+			this.numberOfConfirmations = 0;
+		}
 	
 		private void sendChunk(byte[] messageCompleted) throws IOException{
-			long Initial_t, current_t;
-			Initial_t = System.currentTimeMillis();
-			current_t = System.currentTimeMillis();
-			while( current_t < Initial_t + 500)
-				current_t = System.currentTimeMillis();
 			Main.mdr.send(messageCompleted);
 		}
 		
@@ -90,7 +90,6 @@ public class McHandler extends Thread {
 			msgStream.write((byte) 0x0a);
 			msgStream.write(data);
 			byte[] messageCompleted = msgStream.toByteArray();
-			
 			return messageCompleted;
 		}
 }

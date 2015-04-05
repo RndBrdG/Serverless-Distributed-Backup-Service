@@ -31,8 +31,7 @@ public class Backup {
 		//System.out.println(toBeHashed);
 		MessageDigest md = MessageDigest.getInstance("SHA-256");
 		this.fileID = md.digest( toBeHashed.getBytes("UTF-8"));
-
-		Main.files.put(this.filename, Main.bytesToHex(this.fileID));
+		Main.files.put(this.filename.toLowerCase(), Main.bytesToHex(this.fileID) + " " + this.filesize);
 		splitFile();
 		sendingChunks();
 	}
@@ -75,17 +74,10 @@ public class Backup {
 		long wait_multiplier = 1;
 		int tries = 0;
 		for(int i = 0; i < this.chunkFiles.size(); i++){
+			
 			Main.logfile.appendLog("-------- CHUNK " + Main.bytesToHex(this.fileID) + " No." + this.chunkFiles.get(i).getChunkNumber() + " --------" + '\n');
-			String chunkInformation  = new String();
-			chunkInformation = "PUTCHUNK " + "1.0 " + Main.bytesToHex(this.fileID) + " " + new Integer(this.chunkFiles.get(i).getChunkNumber()) + " " + new Integer(this.chunkFiles.get(i).getTargetReplicationDegree());
-			ByteArrayOutputStream msgStream = new ByteArrayOutputStream();
-			msgStream.write(chunkInformation.getBytes());
-			msgStream.write((byte) 0x0d);
-			msgStream.write((byte) 0x0a);
-			msgStream.write((byte) 0x0d);
-			msgStream.write((byte) 0x0a);
-			msgStream.write(this.chunkFiles.get(i).getContent());
-			byte[] messageCompleted = msgStream.toByteArray();
+			byte[] messageCompleted = createMessage(i);
+			
 			do{
 				Main.mdb.send(messageCompleted);
 				Initial_t = System.currentTimeMillis();
@@ -101,9 +93,24 @@ public class Backup {
 						Main.errorsLog.appendLog("There was something wrong. We tried 3 times to get it right, but we didn't have good answers");
 						break;
 					}
+					Main.resetNumberOfConfirmation();
 				}
 			}while(true);
+			Main.resetNumberOfConfirmation();
 		}
 		Main.logfile.appendLog('\n'+"-------- END OF CHUNK --------\n"+'\n');
+	}
+	
+	private byte[] createMessage(int i) throws IOException {
+		String chunkInformation  = new String();
+		chunkInformation = "PUTCHUNK " + "1.0 " + Main.bytesToHex(this.fileID) + " " + new Integer(this.chunkFiles.get(i).getChunkNumber()) + " " + new Integer(this.chunkFiles.get(i).getTargetReplicationDegree());
+		ByteArrayOutputStream msgStream = new ByteArrayOutputStream();
+		msgStream.write(chunkInformation.getBytes());
+		msgStream.write((byte) 0x0d);
+		msgStream.write((byte) 0x0a);
+		msgStream.write((byte) 0x0d);
+		msgStream.write((byte) 0x0a);
+		msgStream.write(this.chunkFiles.get(i).getContent());
+		return msgStream.toByteArray();
 	}
 }
