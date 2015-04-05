@@ -33,6 +33,10 @@ public class Chunk implements Comparable<Chunk> {
 	public byte[] getContent() {
 		return content;
 	}
+	
+	public void decrementReplication() {
+		--actualReplicationDegree;
+	}
 
 	@Override
 	public int compareTo(Chunk chunk2) {

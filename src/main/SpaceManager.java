@@ -29,6 +29,15 @@ public class SpaceManager extends Thread {
 		storedChunks.add(toAdd);
 		usedSpace += toAdd.getContent().length;
 	}
+	
+	public void decrementChunkReplication(byte[] fileId, int chunkNo) {
+		for (Chunk targetChunk : storedChunks) {
+			if (targetChunk.getFileId().equals(fileId) && targetChunk.getChunkNumber() == chunkNo) {
+				targetChunk.decrementReplication();
+				break;
+			}
+		}
+	}
 
 	@Override
 	public void run() {

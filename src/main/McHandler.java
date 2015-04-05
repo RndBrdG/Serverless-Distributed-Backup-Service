@@ -39,11 +39,11 @@ public class McHandler extends Thread {
 							int read = readStream.read(byteChunkPart, 0, (int)readLength);
 							readStream.close();
 							sendChunk( createChunkMessage(byteChunkPart,msg[2],msg[3]));
-						}catch (IOException exception) {
+						} catch (IOException exception) {
 							exception.printStackTrace();
 						}
 					}
-					else if (isValid && !restore){}
+					else if (isValid && !restore) {}
 					else Main.errorsLog.appendLog("Message is not properly written. FILE ID : " + msg[2]);
 				}
 			}
@@ -51,12 +51,16 @@ public class McHandler extends Thread {
 
 		private boolean updateByteContents(String[] msg) {
 			if (msg[0].equals("STORED") && msg[1].equals("1.0")) {
-				this.numberOfConfirmations += 1;
-				this.restore = false;
+				numberOfConfirmations += 1;
+				restore = false;
 			}
 			else if (msg[0].equals("GETCHUNK") && msg[1].equals("1.0")) {
-				this.restore = true;
+				restore = true;
 				return fileExists(msg);
+			}
+			else if (msg[0].equals("REMOVED") && msg[1].equals("1.0")) {
+				Main.spaceManager.decrementChunkReplication(msg[2].getBytes(), Integer.parseInt(msg[3]));
+				restore = false;
 			}
 			else return false;
 
@@ -64,16 +68,16 @@ public class McHandler extends Thread {
 		}
 		
 		private boolean fileExists(String[] msg){
-			File file = new File("CHUNKS" + File.separator + msg[2] + File.separator + msg[3]);
+			File file = new File("chunks" + File.separator + msg[2] + File.separator + msg[3]);
 			return file.exists();
 		}
 		
 		public int getNumberOfconf(){
-			return this.numberOfConfirmations;
+			return numberOfConfirmations;
 		}
 		
 		public void resetNumberOfConf(){
-			this.numberOfConfirmations = 0;
+			numberOfConfirmations = 0;
 		}
 	
 		private void sendChunk(byte[] messageCompleted) throws IOException{
