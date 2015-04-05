@@ -1,6 +1,7 @@
 package main;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -33,6 +34,8 @@ public class SpaceManager extends Thread {
 	public void run() {
 		while (usedSpace > totalSpace) {
 			Chunk removed = storedChunks.remove(0); // Falta verificação para ver se desce do nível de replicação desejável
+			File toRemove = new File("chunks" + File.separator + removed.getFileId() + File.separator + removed.getChunkNumber());
+			toRemove.delete();
 			String removedMsg = "REMOVED 1.0 " + removed.getFileId() + " " + removed.getChunkNumber() + " ";
 			ByteArrayOutputStream msgStream = new ByteArrayOutputStream();
 			try {

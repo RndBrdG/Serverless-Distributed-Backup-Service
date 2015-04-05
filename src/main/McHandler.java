@@ -25,7 +25,7 @@ public class McHandler extends Thread {
 					String[] msg = msgQueue.poll().split("\\s",5);
 					boolean isValid = updateByteContents(msg);
 					if (isValid && restore) {
-						String filename = new String("CHUNKS" + File.separator + new String(msg[2]) + File.separator + msg[3]);
+						String filename = new String("chunks" + File.separator + new String(msg[2]) + File.separator + msg[3]);
 						File tmp = new File(filename);
 						long tmpSize = tmp.length();
 						long readLength = 64000;
