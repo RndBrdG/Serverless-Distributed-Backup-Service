@@ -13,6 +13,7 @@ public class SpaceManager extends Thread {
 
 	public SpaceManager(int totalSpace) {
 		this.totalSpace = totalSpace;
+		this.storedChunks = new ArrayList<Chunk>();
 	}
 
 	public int getAvailableSpace() {
