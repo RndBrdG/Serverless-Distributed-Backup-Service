@@ -2,19 +2,30 @@ package main;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
+import java.util.PriorityQueue;
 
 import serviceInterfaces.Chunk;
 
 public class SpaceManager extends Thread {
 	private int totalSpace;
 	private int usedSpace;
-	private ArrayList<Chunk> storedChunks;
+	private PriorityQueue<Chunk> storedChunks;
 
-	public SpaceManager(int totalSpace) {
+	public SpaceManager(int totalSpace) throws FileNotFoundException, UnsupportedEncodingException {
 		this.totalSpace = totalSpace;
-		this.storedChunks = new ArrayList<Chunk>();
+		this.storedChunks = new PriorityQueue<Chunk>();
+		File chunkLog = new File("chunkLog");
+		String logName = "chunkLog";
+		if (!chunkLog.isFile()) {
+			PrintWriter writer = new PrintWriter(logName, "UTF-8");
+			writer.println("==================" + '\n' + "   " + logName + " FILE     " + '\n' + "==================");
+			writer.close();
+		}
 	}
 
 	public int getAvailableSpace() {
@@ -43,10 +54,22 @@ public class SpaceManager extends Thread {
 	public void run() {
 		while (!isInterrupted()) {
 			if (usedSpace > totalSpace) {
-				Chunk removed = storedChunks.remove(0); // Falta verificação para ver se desce do nível de replicação desejável
-				File toRemove = new File("chunks" + File.separator + removed.getFileId() + File.separator + removed.getChunkNumber());
+				Chunk chunkToRemove = null;
+				{
+					Iterator<Chunk> chunkIterator = storedChunks.iterator();
+					chunkToRemove = chunkIterator.next();
+					int replicationDegreeDifference = chunkToRemove.getActualReplicationDegree() - chunkToRemove.getTargetReplicationDegree();
+
+					while (chunkIterator.hasNext()) {
+						Chunk nextChunk = chunkIterator.next();
+						if (nextChunk.getActualReplicationDegree() - nextChunk.getTargetReplicationDegree() > replicationDegreeDifference)
+							chunkToRemove = nextChunk;
+					}
+				}
+
+				File toRemove = new File("chunks" + File.separator + chunkToRemove.getFileId() + File.separator + chunkToRemove.getChunkNumber());
 				toRemove.delete();
-				String removedMsg = "REMOVED 1.0 " + removed.getFileId() + " " + removed.getChunkNumber() + " ";
+				String removedMsg = "REMOVED 1.0 " + chunkToRemove.getFileId() + " " + chunkToRemove.getChunkNumber() + " ";
 				ByteArrayOutputStream msgStream = new ByteArrayOutputStream();
 				try {
 					msgStream.write(removedMsg.getBytes());
