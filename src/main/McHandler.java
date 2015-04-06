@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Queue;
 
+import serviceInterfaces.Chunk;
+
 public class McHandler extends Thread {
 		private Queue<String> msgQueue;
 		private volatile int numberOfConfirmations;
@@ -26,6 +28,7 @@ public class McHandler extends Thread {
 					String[] msg = msgQueue.poll().split("\\s",5);
 					boolean isValid = updateByteContents(msg);
 					if (isValid && restore) {
+						
 						String filename = new String("chunks" + File.separator + new String(msg[2]) + File.separator + msg[3]);
 						File tmp = new File(filename);
 						long tmpSize = tmp.length();
@@ -54,6 +57,13 @@ public class McHandler extends Thread {
 		private boolean updateByteContents(String[] msg) {
 			if (msg[0].equals("STORED") && msg[1].equals("1.0")) {
 				numberOfConfirmations += 1;
+				
+				Chunk currentChunk = new Chunk(msg[2].getBytes(), 0, Integer.parseInt(msg[3]), msg[2].getBytes());
+				
+				for(Chunk tmp : Main.spaceManager.getStoredChunks()){
+					if (tmp.compareTo(currentChunk) == 0)
+						tmp.incrementReplication();
+				}
 				restore = false;
 			}
 			else if (msg[0].equals("GETCHUNK") && msg[1].equals("1.0")) {

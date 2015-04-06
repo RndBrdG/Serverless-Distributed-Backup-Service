@@ -6,19 +6,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.PriorityQueue;
-
 import serviceInterfaces.Chunk;
 
 public class SpaceManager extends Thread {
 	private int totalSpace;
 	private int usedSpace;
-	private PriorityQueue<Chunk> storedChunks;
+	private ArrayList<Chunk> storedChunks;
 
 	public SpaceManager(int totalSpace) throws FileNotFoundException, UnsupportedEncodingException {
 		this.totalSpace = totalSpace;
-		this.storedChunks = new PriorityQueue<Chunk>();
+		this.storedChunks = new ArrayList<Chunk>();
 		File chunkLog = new File("chunkLog");
 		String logName = "chunkLog";
 		if (!chunkLog.isFile()) {
@@ -31,7 +30,11 @@ public class SpaceManager extends Thread {
 	public int getAvailableSpace() {
 		return totalSpace;
 	}
-
+	
+	public ArrayList<Chunk> getStoredChunks(){
+		return this.storedChunks;
+	}
+	
 	public void setAvailableSpace(int totalSpace) {
 		this.totalSpace = totalSpace;
 	}
@@ -66,9 +69,6 @@ public class SpaceManager extends Thread {
 							chunkToRemove = nextChunk;
 					}
 				}
-				if (chunkToRemove == null || chunkToRemove.getActualReplicationDegree() <= 1) continue;
-
-				System.out.println("Deleting chunk " + chunkToRemove.getFileId() + " " + chunkToRemove.getChunkNumber());
 
 				File toRemove = new File("chunks" + File.separator + chunkToRemove.getFileId() + File.separator + chunkToRemove.getChunkNumber());
 				toRemove.delete();

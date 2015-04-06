@@ -12,6 +12,7 @@ public class Chunk implements Comparable<Chunk> {
 		this.targetReplicationDegree = targetReplicationDegree;
 		this.chunkNumber = chunkNumber;
 		this.content = content;
+		this.actualReplicationDegree = 0;
 	}
 	
 	public byte[] getFileId() {
@@ -37,9 +38,13 @@ public class Chunk implements Comparable<Chunk> {
 	public void decrementReplication() {
 		--actualReplicationDegree;
 	}
+	
+	public void incrementReplication(){
+		this.actualReplicationDegree++;
+	}
 
 	@Override
 	public int compareTo(Chunk chunk2) {
-		return actualReplicationDegree < chunk2.actualReplicationDegree ? -1 : actualReplicationDegree > chunk2.actualReplicationDegree ? 1 : 0;
+		return fileId.equals(chunk2.fileId) && chunkNumber == chunk2.chunkNumber ? 0 : -1;
 	}
 }

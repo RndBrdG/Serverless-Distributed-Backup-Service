@@ -51,6 +51,16 @@ public class MdbHandler extends Thread {
 		String stringBody = new String(msg[5].substring(3));
 
 		currentChunk = new Chunk(msg[2].getBytes(), Integer.parseInt(msg[4]), Integer.parseInt(msg[3]), stringBody.getBytes(StandardCharsets.ISO_8859_1));
+		currentChunk.incrementReplication();
+		
+		if (!Main.spaceManager.getStoredChunks().contains(currentChunk))
+			Main.spaceManager.addChunk(currentChunk);
+		else {
+			for(Chunk tmp : Main.spaceManager.getStoredChunks()){
+				if (tmp.compareTo(currentChunk) == 0)
+					tmp.incrementReplication();
+			}
+		}
 		return true;
 	}
 	
