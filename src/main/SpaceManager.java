@@ -29,7 +29,7 @@ public class SpaceManager extends Thread {
 		storedChunks.add(toAdd);
 		usedSpace += toAdd.getContent().length;
 	}
-	
+
 	public void decrementChunkReplication(byte[] fileId, int chunkNo) {
 		for (Chunk targetChunk : storedChunks) {
 			if (targetChunk.getFileId().equals(fileId) && targetChunk.getChunkNumber() == chunkNo) {
@@ -41,24 +41,26 @@ public class SpaceManager extends Thread {
 
 	@Override
 	public void run() {
-		while (usedSpace > totalSpace) {
-			Chunk removed = storedChunks.remove(0); // Falta verificação para ver se desce do nível de replicação desejável
-			File toRemove = new File("chunks" + File.separator + removed.getFileId() + File.separator + removed.getChunkNumber());
-			toRemove.delete();
-			String removedMsg = "REMOVED 1.0 " + removed.getFileId() + " " + removed.getChunkNumber() + " ";
-			ByteArrayOutputStream msgStream = new ByteArrayOutputStream();
-			try {
-				msgStream.write(removedMsg.getBytes());
-				msgStream.write((byte) 0x0d);
-				msgStream.write((byte) 0x0a);
-				msgStream.write((byte) 0x0d);
-				msgStream.write((byte) 0x0a);
-				msgStream.close();
-				
-				byte[] messageCompleted = msgStream.toByteArray();
-				Main.mc.send(messageCompleted);
-			} catch (IOException e) {
-				e.printStackTrace();
+		while (!isInterrupted()) {
+			if (usedSpace > totalSpace) {
+				Chunk removed = storedChunks.remove(0); // Falta verificação para ver se desce do nível de replicação desejável
+				File toRemove = new File("chunks" + File.separator + removed.getFileId() + File.separator + removed.getChunkNumber());
+				toRemove.delete();
+				String removedMsg = "REMOVED 1.0 " + removed.getFileId() + " " + removed.getChunkNumber() + " ";
+				ByteArrayOutputStream msgStream = new ByteArrayOutputStream();
+				try {
+					msgStream.write(removedMsg.getBytes());
+					msgStream.write((byte) 0x0d);
+					msgStream.write((byte) 0x0a);
+					msgStream.write((byte) 0x0d);
+					msgStream.write((byte) 0x0a);
+					msgStream.close();
+
+					byte[] messageCompleted = msgStream.toByteArray();
+					Main.mc.send(messageCompleted);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

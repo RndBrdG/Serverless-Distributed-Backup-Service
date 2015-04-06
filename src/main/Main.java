@@ -52,7 +52,7 @@ public class Main {
 			backedUpFiles.readLog();
 			
 			spaceManager = new SpaceManager(5 * 1024); // Espaço disponível para backups, em KB
-			spaceManager.start();
+			//spaceManager.start(); // TESTAR
 
 			ipMC = args[0];
 			portMC = Integer.parseInt(args[1]);
@@ -106,13 +106,14 @@ public class Main {
 				}
 			}
 			
-			// Parar o thread de escuta e fechar os canais de multicast
+			// Parar os threads de escuta e fechar os canais de multicast
 			mdrHandler.interrupt();
 			mcHandler.interrupt();
 			mdbHandler.interrupt();
 			mdr.close();
 			mdb.close();
 			mc.close();
+			//spaceManager.interrupt();
 			console.endInput();
 		}
 	}
