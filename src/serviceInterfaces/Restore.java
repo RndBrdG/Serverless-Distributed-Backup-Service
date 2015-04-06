@@ -10,7 +10,6 @@ import main.Main;
 import console.Console;
 
 public class Restore {
-
 	private String fileID;
 	private String[] FILE;
 	private String size;
@@ -40,7 +39,7 @@ public class Restore {
 			}
 	}
 	
-	private byte[] buildMessage(int chunkNO) throws IOException{
+	private byte[] buildMessage(int chunkNO) throws IOException {
 		String msg = "GETCHUNK 1.0 " + this.fileID + " " + chunkNO + " ";
 		ByteArrayOutputStream msgStream = new ByteArrayOutputStream();
 		msgStream.write(msg.getBytes());

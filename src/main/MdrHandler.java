@@ -34,7 +34,7 @@ public class MdrHandler extends Thread{
 	}
 
 	private void createFile() {
-		String filename = new String("RESTORE" + File.separator + new String(currentChunk.getFileId()) + File.separator + currentChunk.getChunkNumber());
+		String filename = new String("restore" + File.separator + new String(currentChunk.getFileId()) + File.separator + currentChunk.getChunkNumber());
 		try {
 			File tmp = new File(filename);
 			if (!tmp.getParentFile().exists())
@@ -86,7 +86,7 @@ public class MdrHandler extends Thread{
 		ArrayList<File> filesList = new ArrayList<File>();
 		for(int i = 0; i <= Integer.parseInt(info[1]) / 64000; i++){
 			int j = i + 1;
-			filesList.add(new File("RESTORE"+ File.separator + info[0] + File.separator + j));
+			filesList.add(new File("restore"+ File.separator + info[0] + File.separator + j));
 		}
 		
 		try {
@@ -102,9 +102,8 @@ public class MdrHandler extends Thread{
 				infoBytes = null;
 				file.delete();
 			}
-		}catch (Exception exception){
+		} catch (Exception exception){
             exception.printStackTrace();
         }
-
 	}
 }

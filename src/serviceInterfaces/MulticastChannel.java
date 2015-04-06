@@ -27,6 +27,7 @@ public class MulticastChannel {
 
 	public void join() throws IOException {
 		socket = new MulticastSocket(port);
+		socket.setTimeToLive(1);
 		socket.joinGroup(group);
 		socket.setLoopbackMode(true);
 	}
