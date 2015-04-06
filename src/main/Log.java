@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
+import serviceInterfaces.Chunk;
+
 public class Log {
 	private String name;
 	public Log(String name) throws FileNotFoundException, UnsupportedEncodingException{
@@ -42,6 +44,26 @@ public class Log {
 	        while (line != null) {
 	            String[] msg = line.split(" ");
 	            Main.files.put(msg[0].toLowerCase(), msg[1] + " " + msg[2]);
+	            line = br.readLine();
+	        }
+	    } finally {
+	        br.close();
+	    }
+	}
+
+	public void readLog(boolean value) throws IOException{
+		BufferedReader br = new BufferedReader(new FileReader(name));
+	    try {
+	        // PRIMEIRAS TRÊS LINHAS NÂO CONTÊM INFORMAÇÃO RELEVANTE
+	        String line = br.readLine();
+	        line = br.readLine();
+	        line = br.readLine();
+	        line = br.readLine();
+	        Chunk novoChunk;
+	        while (line != null) {
+	            String[] msg = line.split(" ");
+	            novoChunk = new Chunk(msg[0].getBytes(), Integer.parseInt(msg[1]), Integer.parseInt(msg[2]), Integer.parseInt(msg[3]));
+	            Main.spaceManager.addChunk(novoChunk);
 	            line = br.readLine();
 	        }
 	    } finally {

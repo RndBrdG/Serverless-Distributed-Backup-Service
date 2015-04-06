@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import serviceInterfaces.Backup;
+import serviceInterfaces.Chunk;
 import serviceInterfaces.Delete;
 import serviceInterfaces.MulticastChannel;
 import serviceInterfaces.Restore;
@@ -35,7 +36,7 @@ public class Main {
 	public static Log logfile = null;
 	public static Log errorsLog = null;
 	public static Log backedUpFiles = null;
-	
+	public static Log chunkFiles = null;
 	public static Map<String,String> files = null;
 	public static SpaceManager spaceManager = null;
 
@@ -46,15 +47,17 @@ public class Main {
 		}
 		else {			
 			files = new HashMap<String, String>();
-			
+
 			//log
 			logfile = new Log("log.txt");
 			errorsLog = new Log("errors.txt");
 			backedUpFiles = new Log("backedUpFiles.txt");
 			backedUpFiles.readLog();
-			
-			spaceManager = new SpaceManager(5 * 1024); // Espaço disponível para backups, em KB
-			//spaceManager.start(); // TESTAR
+			chunkFiles = new Log("chunkInfo.txt");
+			chunkFiles.readLog(true);
+
+			spaceManager = new SpaceManager(130); // Espaço disponível para backups, em KB
+			spaceManager.start(); // TESTAR
 
 			ipMC = args[0];
 			portMC = Integer.parseInt(args[1]);
@@ -80,7 +83,7 @@ public class Main {
 			mcListener.start();
 			mcHandler = new McHandler(mcListener.getQueue());
 			mcHandler.start();
-			
+
 			mdrListener = new MulticastListener(mdr);
 			mdrListener.start();
 			mdrHandler = new MdrHandler(mdrListener.getQueue());
@@ -110,7 +113,7 @@ public class Main {
 					break;
 				}
 			}
-			
+
 			// Parar os threads de escuta e fechar os canais de multicast
 			mdrHandler.interrupt();
 			mcHandler.interrupt();
@@ -118,7 +121,7 @@ public class Main {
 			mdr.close();
 			mdb.close();
 			mc.close();
-			//spaceManager.interrupt();
+			spaceManager.interrupt();
 			console.endInput();
 		}
 	}
@@ -135,15 +138,20 @@ public class Main {
 	public static int getNumberOfConfirmation(){
 		return Main.mcHandler.getNumberOfconf();
 	}
-	
+
 	public static void resetNumberOfConfirmation(){
 		Main.mcHandler.resetNumberOfConf();
 	}
-	
+
 	private static void insertDataOnFileLog() throws FileNotFoundException{
 		Main.backedUpFiles.clearFile();
 		for (Map.Entry<String, String> key : Main.files.entrySet()) {
 			Main.backedUpFiles.appendLog( key.getKey() + " " + key.getValue());
+		}
+
+		Main.chunkFiles.clearFile();
+		for (Chunk id : Main.spaceManager.getStoredChunks()){
+			Main.chunkFiles.appendLog(new String(id.getFileId()) + " " + id.getActualReplicationDegree() + " " + id.getTargetReplicationDegree() + " " + id.getChunkNumber());
 		}
 	}
 }
