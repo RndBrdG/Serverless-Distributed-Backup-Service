@@ -1,6 +1,5 @@
 package main;
 
-import java.awt.List;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -22,7 +21,7 @@ public class MdrHandler extends Thread{
 	
 	public void run() {
 		while (!isInterrupted()) {
-			if (!msgQueue.isEmpty() && !Main.files.isEmpty()) {
+			if (!msgQueue.isEmpty()) {
 				String[] msg = msgQueue.poll().split("\\s",5);
 				boolean isValid = updateByteContents(msg);
 				if (isValid){
@@ -52,7 +51,6 @@ public class MdrHandler extends Thread{
 				mergeFiles(value);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -78,7 +76,7 @@ public class MdrHandler extends Thread{
 	}
 	
 	private void mergeFiles(String[] info){
-		File newFile = new File("restore"+ File.separator + info[0] + File.separator + info[2]);
+		File newFile = new File("RESTORE"+ File.separator + info[0] + File.separator + info[2]);
 		FileOutputStream out;
 		FileInputStream in;
 		byte[] infoBytes;
@@ -102,6 +100,8 @@ public class MdrHandler extends Thread{
 				infoBytes = null;
 				file.delete();
 			}
+			out.close();
+			filesList.clear();
 		} catch (Exception exception){
             exception.printStackTrace();
         }

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import serviceInterfaces.Backup;
+import serviceInterfaces.Delete;
 import serviceInterfaces.MulticastChannel;
 import serviceInterfaces.Restore;
 import console.Console;
@@ -29,6 +30,7 @@ public class Main {
 	private static MdrHandler mdrHandler = null;
 	private static Backup bkp = null;
 	private static Restore rst = null;
+	private static Delete dlt = null;
 	private static Console console = new Console();
 	public static Log logfile = null;
 	public static Log errorsLog = null;
@@ -95,6 +97,9 @@ public class Main {
 				case "RESTORE":
 					rst = new Restore();
 					rst.start();
+					break;
+				case "DELETE":
+					dlt = new Delete();
 					break;
 				case "SETSPACE":
 					spaceManager.setAvailableSpace(Integer.parseInt(Console.getInputFromUser("How much space should be dedicated to store other computers' backups?")));

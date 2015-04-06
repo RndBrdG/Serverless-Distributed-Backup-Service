@@ -5,17 +5,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Queue;
-import java.util.Random;
 
 public class McHandler extends Thread {
 		private Queue<String> msgQueue;
 		private volatile int numberOfConfirmations;
 		private boolean restore;
+		private boolean delete;
 		
 		public McHandler(Queue<String> msgQueue) {
 			this.msgQueue = msgQueue;
 			this.numberOfConfirmations = 0;
 			this.restore = false;
+			this.delete = false;
 		}
 
 		@Override
@@ -43,6 +44,7 @@ public class McHandler extends Thread {
 							exception.printStackTrace();
 						}
 					}
+					else if (isValid && !restore && delete) deleteMessage(msg);
 					else if (isValid && !restore) {}
 					else Main.errorsLog.appendLog("Message is not properly written. FILE ID : " + msg[2]);
 				}
@@ -61,6 +63,11 @@ public class McHandler extends Thread {
 			else if (msg[0].equals("REMOVED") && msg[1].equals("1.0")) {
 				Main.spaceManager.decrementChunkReplication(msg[2].getBytes(), Integer.parseInt(msg[3]));
 				restore = false;
+			}
+			else if (msg[0].equals("DELETE") && msg[1].equals("1.0")){
+				System.out.println("DELETED");
+				restore = false;
+				delete = true;
 			}
 			else return false;
 
@@ -95,5 +102,18 @@ public class McHandler extends Thread {
 			msgStream.write(data);
 			byte[] messageCompleted = msgStream.toByteArray();
 			return messageCompleted;
+		}
+		
+		private void deleteMessage(String[] msg) {
+			String path = "chunks" + File.separator + msg[2];
+			File direc = new File(path);
+			if (direc.isDirectory()){
+				String[] children = direc.list();
+				for(int i = 0; i < children.length; i++){
+					File f = new File("chunks" + File.separator + msg[2] + File.separator + children[i]);
+					f.delete();
+				}
+				direc.delete();
+			}
 		}
 }
