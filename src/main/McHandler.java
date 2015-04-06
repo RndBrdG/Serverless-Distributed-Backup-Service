@@ -75,7 +75,6 @@ public class McHandler extends Thread {
 				restore = false;
 			}
 			else if (msg[0].equals("DELETE") && msg[1].equals("1.0")){
-				System.out.println("DELETED");
 				restore = false;
 				delete = true;
 			}
