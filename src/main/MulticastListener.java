@@ -22,10 +22,9 @@ public class MulticastListener extends Thread {
 		while (!isInterrupted()) {
 			try {
 				byte[] buf = new byte[65536];
-				
+
 				byte[] data = multicastChannel.receive(buf);
-				if (data != null)
-					receivedMsgs.add(new String(data, StandardCharsets.ISO_8859_1));
+				receivedMsgs.add(new String(data, StandardCharsets.ISO_8859_1));
 			}
 			catch (SocketException e) {
 				break;
@@ -36,7 +35,7 @@ public class MulticastListener extends Thread {
 			}
 		}
 	}
-	
+
 	public Queue<String> getQueue() {
 		return this.receivedMsgs;
 	}

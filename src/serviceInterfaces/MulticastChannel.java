@@ -28,6 +28,7 @@ public class MulticastChannel {
 	public void join() throws IOException {
 		socket = new MulticastSocket(port);
 		socket.joinGroup(group);
+		socket.setLoopbackMode(true);
 	}
 
 	public void send(byte[] toSend) throws IOException {
@@ -40,17 +41,12 @@ public class MulticastChannel {
 	public byte[] receive(byte[] buf) throws IOException {
 		DatagramPacket packet = new DatagramPacket(buf, buf.length);
 		socket.receive(packet);
-		if ( socket.getLocalAddress().toString().equals(InetAddress.getLocalHost().getHostAddress().toString()))  {
-			return null;
-		}
-		else {
-			byte[] data = Arrays.copyOfRange(packet.getData(), 0, packet.getLength());
-			Date dNow = new Date();
-		    SimpleDateFormat time = new SimpleDateFormat ("hh:mm:ss dd.MM.yyyy");
-			String logString = "[" + time.format(dNow) + " ] * " + packet.getAddress().toString() + "!";
-			Main.logfile.appendLog("[RECEIVED MESSAGE] > " + logString);
-			return data;
-		}
+		byte[] data = Arrays.copyOfRange(packet.getData(), 0, packet.getLength());
+		Date dNow = new Date();
+		SimpleDateFormat time = new SimpleDateFormat ("hh:mm:ss dd.MM.yyyy");
+		String logString = "[" + time.format(dNow) + " ] * " + packet.getAddress().toString() + "!";
+		Main.logfile.appendLog("[RECEIVED MESSAGE] > " + logString);
+		return data;
 	}
 
 	public void close() throws IOException {
