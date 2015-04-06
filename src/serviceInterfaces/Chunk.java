@@ -15,6 +15,11 @@ public class Chunk implements Comparable<Chunk> {
 		this.actualReplicationDegree = 0;
 	}
 	
+	public Chunk(byte[] fileId, int actualReplicationDegree, int targetReplicationDegree, int chunkNumber) {
+		this(fileId, targetReplicationDegree, chunkNumber, null);
+		this.actualReplicationDegree = actualReplicationDegree;
+	}
+	
 	public byte[] getFileId() {
 		return fileId;
 	}

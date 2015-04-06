@@ -1,16 +1,15 @@
 package main;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import serviceInterfaces.Chunk;
 
-public class SpaceManager extends Thread {
+public class SpaceManager {
 	private int totalSpace;
 	private int usedSpace;
 	private ArrayList<Chunk> storedChunks;
@@ -53,44 +52,28 @@ public class SpaceManager extends Thread {
 		}
 	}
 
-	@Override
-	public void run() {
-		while (!isInterrupted()) {
-			if (usedSpace > totalSpace) {
-				Chunk chunkToRemove = null;
-				{
-					Iterator<Chunk> chunkIterator = storedChunks.iterator();
-					chunkToRemove = chunkIterator.next();
-					int replicationDegreeDifference = chunkToRemove.getActualReplicationDegree() - chunkToRemove.getTargetReplicationDegree();
+	public void makeSpace() {
+		while (usedSpace >= totalSpace) {
+			Iterator<Chunk> chunkIterator = storedChunks.iterator();
+			if (!chunkIterator.hasNext()) return;
 
-					while (chunkIterator.hasNext()) {
-						Chunk nextChunk = chunkIterator.next();
-						if (nextChunk.getActualReplicationDegree() - nextChunk.getTargetReplicationDegree() > replicationDegreeDifference)
-							chunkToRemove = nextChunk;
-					}
-				}
-				if (chunkToRemove == null || chunkToRemove.getActualReplicationDegree() <= 1) continue;
+			Chunk chunkToRemove = chunkIterator.next();
 
-				System.out.println("Deleting chunk " + chunkToRemove.getFileId() + " " + chunkToRemove.getChunkNumber());
-
-				File toRemove = new File("chunks" + File.separator + chunkToRemove.getFileId() + File.separator + chunkToRemove.getChunkNumber());
-				toRemove.delete();
-				String removedMsg = "REMOVED 1.0 " + chunkToRemove.getFileId() + " " + chunkToRemove.getChunkNumber() + " ";
-				ByteArrayOutputStream msgStream = new ByteArrayOutputStream();
-				try {
-					msgStream.write(removedMsg.getBytes());
-					msgStream.write((byte) 0x0d);
-					msgStream.write((byte) 0x0a);
-					msgStream.write((byte) 0x0d);
-					msgStream.write((byte) 0x0a);
-					msgStream.close();
-
-					byte[] messageCompleted = msgStream.toByteArray();
-					Main.mc.send(messageCompleted);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			while (chunkIterator.hasNext()) {
+				int replicationDegreeDifference = chunkToRemove.getActualReplicationDegree() - chunkToRemove.getTargetReplicationDegree();
+				Chunk nextChunk = chunkIterator.next();
+				if (nextChunk.getActualReplicationDegree() - nextChunk.getTargetReplicationDegree() > replicationDegreeDifference)
+					chunkToRemove = nextChunk;
 			}
+
+			if (chunkToRemove.getActualReplicationDegree() <= 1) return;
+
+			System.out.println("Chunk no. " + chunkToRemove.getChunkNumber() + " of file ID " + chunkToRemove.getFileId() + " removed!");
+
+			storedChunks.remove(chunkToRemove);
+
+			File fileToRemove = new File("chunks" + File.separator + chunkToRemove.getFileId() + File.separator + chunkToRemove.getChunkNumber());
+			fileToRemove.delete();
 		}
 	}
 }

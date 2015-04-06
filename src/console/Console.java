@@ -25,7 +25,7 @@ public class Console {
 				clearScreen();
 				break loop;
 			case "4":
-				userOption = "SETSPACE";
+				userOption = "FREESPACE";
 				clearScreen();
 				break loop;
 			case "5":
@@ -43,7 +43,7 @@ public class Console {
 		System.out.println("[1] Backup file");
 		System.out.println("[2] Restore file");
 		System.out.println("[3] Remove file from backups");
-		System.out.println("[4] Set available space for backups");
+		System.out.println("[4] Set available storage and free space");
 		System.out.println("[5] Exit");
 	}
 	

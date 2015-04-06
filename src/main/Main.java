@@ -57,7 +57,6 @@ public class Main {
 			chunkFiles.readLog(true);
 
 			spaceManager = new SpaceManager(130); // Espaço disponível para backups, em KB
-			spaceManager.start(); // TESTAR
 
 			ipMC = args[0];
 			portMC = Integer.parseInt(args[1]);
@@ -104,8 +103,9 @@ public class Main {
 				case "DELETE":
 					dlt = new Delete();
 					break;
-				case "SETSPACE":
-					spaceManager.setAvailableSpace(Integer.parseInt(Console.getInputFromUser("How much space should be dedicated to store other computers' backups?")));
+				case "FREESPACE":
+					System.out.println("How much space should be dedicated to store other computers' backups?");
+					spaceManager.setAvailableSpace(Integer.parseInt(Console.getInputFromUser("Leave blank to keep current value (" + spaceManager.getAvailableSpace() + ")")));
 					break;
 				case "BYE":
 					endlessLoop = false;
@@ -121,7 +121,6 @@ public class Main {
 			mdr.close();
 			mdb.close();
 			mc.close();
-			spaceManager.interrupt();
 			console.endInput();
 		}
 	}
