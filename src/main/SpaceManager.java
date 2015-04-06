@@ -66,6 +66,9 @@ public class SpaceManager extends Thread {
 							chunkToRemove = nextChunk;
 					}
 				}
+				if (chunkToRemove == null || chunkToRemove.getActualReplicationDegree() <= 1) continue;
+
+				System.out.println("Deleting chunk " + chunkToRemove.getFileId() + " " + chunkToRemove.getChunkNumber());
 
 				File toRemove = new File("chunks" + File.separator + chunkToRemove.getFileId() + File.separator + chunkToRemove.getChunkNumber());
 				toRemove.delete();
